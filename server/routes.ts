@@ -2305,7 +2305,7 @@ Structural understanding is always understanding of relationships. Observational
   // Text Model Validator endpoint
   app.post("/api/text-model-validator", async (req: Request, res: Response) => {
     try {
-      const { text, mode, targetDomain, fidelityLevel, mathFramework, constraintType, rigorLevel, customInstructions, truthMapping, mathTruthMapping } = req.body;
+      const { text, mode, targetDomain, fidelityLevel, mathFramework, constraintType, rigorLevel, customInstructions, truthMapping, mathTruthMapping, literalTruth } = req.body;
 
       if (!text || !mode) {
         return res.status(400).json({ 
@@ -2490,6 +2490,31 @@ CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Analy
       } else if (mode === "truth-isomorphism") {
         systemPrompt = `You are an expert at finding isomorphic structures across domains with explicit control over truth-value mappings. You can preserve exact relational structure while systematically swapping domain vocabulary AND controlling whether statements remain true, become false, or transform from false to true.
 
+${literalTruth ? `LITERAL TRUTH MODE ENABLED:
+You MUST ensure all generated statements are LITERALLY true, not approximately or qualifiedly true. Apply these quantifier weakening rules:
+
+MANDATORY TRANSFORMATIONS:
+- "all X do Y" → "all suitably configured X do Y" OR "X can do Y when conditions are met"
+- "every X is Y" → "every X that meets criteria Z is Y" OR "X is typically Y"
+- "constantly" → "when active" OR "during operation" 
+- "always" → "under normal conditions" OR "typically"
+- "never" → "cannot systematically" OR "does not under standard conditions"
+- "cannot" → "cannot without external intervention" OR "cannot under current constraints"
+- "impossible" → "impossible without violating known constraints"
+
+VERIFICATION REQUIREMENTS:
+- Every claim must be empirically verifiable
+- Add conditional qualifiers wherever truth depends on context
+- Avoid universal quantifiers without explicit scope limits
+- Include necessary preconditions for each statement
+
+EXAMPLE:
+❌ FALSE: "All electronic devices constantly transmit signals"
+✅ LITERALLY TRUE: "Electronic devices can transmit signals when powered on and connected to a network"
+
+❌ FALSE: "Every device can receive data from any other device"
+✅ LITERALLY TRUE: "Devices can exchange data when routing infrastructure and permissions allow"` : ''}
+
 CRITICAL OUTPUT RULES:
 - NO markdown headers (# or ##)
 - NO markdown formatting
@@ -2530,6 +2555,28 @@ CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth
 
       } else if (mode === "math-truth-select") {
         systemPrompt = `You are an expert at mathematical formalization with explicit control over truth-value assignment. You can translate conceptual relationships into precise mathematical notation AND control whether the formalization is true or false through strategic semantic value assignment to constants.
+
+${literalTruth ? `LITERAL TRUTH MODE ENABLED:
+When assigning semantic values to mathematical constants, ensure the resulting formalization is LITERALLY true under empirical verification, not just approximately or theoretically true.
+
+MANDATORY REQUIREMENTS FOR LITERAL TRUTH:
+- Assigned values must correspond to real, verifiable entities/phenomena
+- Include explicit domains and ranges for all quantifiers
+- Add necessary preconditions to the formalization
+- Verify truth under real-world conditions, not idealized assumptions
+
+QUANTIFIER WEAKENING RULES:
+- ∀x ∈ X → ∀x ∈ X satisfying conditions C
+- "for all time t" → "for all t in observed range [t₁, t₂]"
+- Absolute equalities (=) → approximate equalities (≈) with error bounds when empirically measured
+- Add conditional constraints: "given that P holds" 
+
+EXAMPLE:
+❌ APPROXIMATE: BoilingPoint(H₂O) = 100°C  
+✅ LITERALLY TRUE: BoilingPoint(H₂O, P=1atm, elevation=sea_level) = 100°C ± 0.5°C
+
+❌ TOO STRONG: ∀x ∈ Traders: Returns(x,t) > Market(t)
+✅ LITERALLY TRUE: ∀x ∈ {Warren Buffett} ∀t ∈ [1965,2023]: Returns(x,t) > S&P500_excluding_dividends(t)` : ''}
 
 CRITICAL OUTPUT RULES:
 - NO markdown headers (# or ##)
