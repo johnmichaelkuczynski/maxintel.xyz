@@ -2655,9 +2655,37 @@ CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth
 
       let output = message.content[0].type === 'text' ? message.content[0].text : '';
 
-      // If literal truth mode is enabled, run verification pass
+      // If literal truth mode is enabled, apply rule-based softening and verification
       if (literalTruth && (mode === 'truth-isomorphism' || mode === 'math-truth-select')) {
-        const verificationPrompt = `You are a strict fact-checker. Review the following output and identify any statements that are NOT literally true (i.e., approximately true, qualifiedly true, or contain unverified absolutes like "all", "every", "always", "never" without proper conditions).
+        // STEP 1: Rule-based quantifier softening (deterministic pass)
+        const softenQuantifiers = (text: string): string => {
+          let softened = text;
+          
+          // Soften absolute universals
+          softened = softened.replace(/\ball ([a-z]+s|devices|systems|networks|entities)\b/gi, (match, noun) => `${noun} that meet the specified conditions`);
+          softened = softened.replace(/\bevery ([a-z]+|device|system|network|entity)\b/gi, (match, noun) => `each ${noun} satisfying the criteria`);
+          softened = softened.replace(/\bconstantly\b/gi, 'during active operation');
+          softened = softened.replace(/\balways\b/gi, 'under normal conditions');
+          softened = softened.replace(/\bnever\b/gi, 'does not systematically');
+          softened = softened.replace(/\bcannot\b/gi, 'cannot without external factors');
+          softened = softened.replace(/\bimpossible\b/gi, 'impossible under current constraints');
+          softened = softened.replace(/\bin all cases\b/gi, 'in typical cases');
+          softened = softened.replace(/\bwithout exception\b/gi, 'with rare exceptions');
+          
+          return softened;
+        };
+
+        output = softenQuantifiers(output);
+
+        // STEP 2: Verification with revision loop (up to 3 attempts)
+        let verificationAttempts = 0;
+        const maxAttempts = 3;
+        let isVerified = false;
+
+        while (!isVerified && verificationAttempts < maxAttempts) {
+          verificationAttempts++;
+
+          const verificationPrompt = `You are a strict fact-checker. Review the following output and identify any statements that are NOT literally true (i.e., approximately true, qualifiedly true, or contain unverified absolutes like "all", "every", "always", "never" without proper conditions).
 
 OUTPUT TO VERIFY:
 ${output}
@@ -2680,25 +2708,63 @@ CORRECTED: [literally true version]
 
 Be extremely strict - reject any approximations, generalizations, or unqualified universals.`;
 
-        const verificationMessage = await anthropic.messages.create({
-          model: "claude-3-7-sonnet-20250219",
-          max_tokens: 2000,
-          temperature: 0,
-          messages: [
-            {
-              role: "user",
-              content: verificationPrompt
+          const verificationMessage = await anthropic.messages.create({
+            model: "claude-3-7-sonnet-20250219",
+            max_tokens: 2000,
+            temperature: 0,
+            messages: [
+              {
+                role: "user",
+                content: verificationPrompt
+              }
+            ]
+          });
+
+          const verificationResult = verificationMessage.content[0].type === 'text' ? verificationMessage.content[0].text : '';
+
+          // Check if verification passed
+          if (verificationResult.includes('VERIFIED: All statements are literally true')) {
+            isVerified = true;
+            output += `\n\n✅ LITERAL TRUTH VERIFIED: All statements have been confirmed to be literally true (verified in ${verificationAttempts} ${verificationAttempts === 1 ? 'attempt' : 'attempts'}).`;
+          } else if (verificationAttempts < maxAttempts) {
+            // Extract corrections and regenerate output
+            console.log(`Verification attempt ${verificationAttempts} failed. Regenerating with corrections...`);
+            
+            // Apply corrections from verification
+            const correctionRegex = /CORRECTED: (.+?)(?=\n\n|$)/gs;
+            const corrections = [];
+            let match;
+            while ((match = correctionRegex.exec(verificationResult)) !== null) {
+              corrections.push(match[1].trim());
             }
-          ]
-        });
 
-        const verificationResult = verificationMessage.content[0].type === 'text' ? verificationMessage.content[0].text : '';
+            if (corrections.length > 0) {
+              // Regenerate with explicit corrections
+              const regeneratePrompt = `${userPrompt}\n\nCRITICAL CORRECTIONS REQUIRED:\nThe following corrections must be incorporated to ensure literal truth:\n${corrections.map((c, i) => `${i + 1}. ${c}`).join('\n')}\n\nRegenerate the complete output incorporating these corrections to ensure ALL statements are literally true.`;
 
-        // If verification found issues, append them to the output
-        if (!verificationResult.includes('VERIFIED: All statements are literally true')) {
-          output += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLITERAL TRUTH VERIFICATION REPORT:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${verificationResult}\n\nNOTE: Some statements in the output above were flagged as not literally true. Please review the verification report and use the corrected versions.`;
-        } else {
-          output += `\n\n✅ LITERAL TRUTH VERIFIED: All statements have been confirmed to be literally true.`;
+              const regenerateMessage = await anthropic.messages.create({
+                model: "claude-3-7-sonnet-20250219",
+                max_tokens: 4096,
+                temperature: 0.5,
+                system: systemPrompt,
+                messages: [
+                  {
+                    role: "user",
+                    content: regeneratePrompt
+                  }
+                ]
+              });
+
+              output = regenerateMessage.content[0].type === 'text' ? regenerateMessage.content[0].text : '';
+              output = softenQuantifiers(output); // Apply softening again
+            } else {
+              // No extractable corrections, fail out
+              break;
+            }
+          } else {
+            // Max attempts reached, include verification report
+            output += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLITERAL TRUTH VERIFICATION REPORT (${verificationAttempts} attempts):\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${verificationResult}\n\nNOTE: After ${maxAttempts} attempts, some statements could not be verified as literally true. Please review the verification report and use the corrected versions above.`;
+          }
         }
       }
 
