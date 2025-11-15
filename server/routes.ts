@@ -2305,7 +2305,7 @@ Structural understanding is always understanding of relationships. Observational
   // Text Model Validator endpoint
   app.post("/api/text-model-validator", async (req: Request, res: Response) => {
     try {
-      const { text, mode, targetDomain, fidelityLevel, mathFramework, constraintType, rigorLevel, customInstructions, truthMapping } = req.body;
+      const { text, mode, targetDomain, fidelityLevel, mathFramework, constraintType, rigorLevel, customInstructions, truthMapping, mathTruthMapping } = req.body;
 
       if (!text || !mode) {
         return res.status(400).json({ 
@@ -2528,10 +2528,62 @@ Provide:
 
 CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth-Value Analysis" not "## 1. Truth-Value Analysis". Output clean, natural prose.`;
 
+      } else if (mode === "math-truth-select") {
+        systemPrompt = `You are an expert at mathematical formalization with explicit control over truth-value assignment. You can translate conceptual relationships into precise mathematical notation AND control whether the formalization is true or false through strategic semantic value assignment to constants.
+
+CRITICAL OUTPUT RULES:
+- NO markdown headers (# or ##)
+- NO markdown formatting
+- Use plain text with clear section labels
+- Natural paragraph formatting only`;
+        
+        const mathTruthDescriptions = {
+          'make-true': 'Assign semantic values to mathematical constants that make the formalization TRUE (useful when the original statement is false)',
+          'keep-true': 'Assign semantic values to mathematical constants that preserve the TRUE nature of the original statement',
+          'make-false': 'Assign semantic values to mathematical constants that make the formalization FALSE (useful for showing counterexamples)'
+        };
+
+        userPrompt = `MATHEMATICAL MODEL WITH TRUTH-VALUE SELECTION
+
+Text to formalize:
+${text}
+
+${mathFramework ? `Mathematical framework: ${mathFramework}` : ''}
+${rigorLevel ? `Rigor level: ${rigorLevel}` : ''}
+Truth-Value Assignment: ${mathTruthMapping ? mathTruthDescriptions[mathTruthMapping as keyof typeof mathTruthDescriptions] : 'Not specified'}
+${customInstructions ? `\nCustom Instructions: ${customInstructions}` : ''}
+
+Task: Create a mathematical formalization of this text AND assign specific semantic values to the constants that control the truth value according to: ${mathTruthMapping}.
+
+${mathTruthMapping === 'make-true' ? `First determine if the original statement is true or false. If it is FALSE, assign semantic values to the mathematical constants that would make the formalization TRUE. Show how assigning different values transforms a false claim into a true mathematical statement.
+
+Example: "All traders consistently beat the market" (FALSE)
+→ Formalize as: ∀x ∈ Traders: Returns(x,t) > Market(t) for all t
+→ Assign values: Traders = {Warren Buffett over 1965-2023}, Market = S&P 500 excluding dividends
+→ Result: NOW TRUE because Buffett's returns exceeded the S&P 500 capital gains over this period` : ''}
+
+${mathTruthMapping === 'keep-true' ? `Determine the truth status of the original statement. If TRUE, assign semantic values that preserve this truth in the formalization. Show how proper value assignment maintains truth across the translation to mathematics.` : ''}
+
+${mathTruthMapping === 'make-false' ? `First determine if the original statement is true. If TRUE, assign semantic values that would make the formalization FALSE. This reveals how the same mathematical structure can have different truth values depending on interpretation.
+
+Example: "Water boils at 100°C" (TRUE under standard conditions)
+→ Formalize as: BoilingPoint(H₂O) = 100°C
+→ Assign values: Conditions = {Pressure = 0.5 atm, Elevation = 5000m}
+→ Result: NOW FALSE because water boils at ~83°C at this pressure` : ''}
+
+Provide:
+1. Truth Analysis: Determine the truth status of the original statement and explain why
+2. Abstract Formalization: The mathematical model with unassigned constants/variables
+3. Semantic Value Assignment: Specific values assigned to each constant to achieve the target truth value
+4. Verification: Proof that the assigned values produce the desired truth value
+5. Alternative Assignments: Show how different value assignments would change the truth value
+
+CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth Analysis" not "## 1. Truth Analysis". Output clean, natural prose.`;
+
       } else {
         return res.status(400).json({
           success: false,
-          message: "Invalid mode. Must be one of: reconstruction, isomorphism, mathmodel, autodecide, truth-isomorphism"
+          message: "Invalid mode. Must be one of: reconstruction, isomorphism, mathmodel, autodecide, truth-isomorphism, math-truth-select"
         });
       }
 

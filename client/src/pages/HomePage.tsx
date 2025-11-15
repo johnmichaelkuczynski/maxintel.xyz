@@ -140,7 +140,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   
   // Text Model Validator State
   const [validatorInputText, setValidatorInputText] = useState("");
-  const [validatorMode, setValidatorMode] = useState<"reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | "truth-isomorphism" | null>(null);
+  const [validatorMode, setValidatorMode] = useState<"reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | "truth-isomorphism" | "math-truth-select" | null>(null);
   const [validatorOutput, setValidatorOutput] = useState<string>("");
   const [validatorLoading, setValidatorLoading] = useState(false);
   const [validatorTargetDomain, setValidatorTargetDomain] = useState("");
@@ -151,6 +151,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   const [showValidatorCustomization, setShowValidatorCustomization] = useState(false);
   const [validatorCustomInstructions, setValidatorCustomInstructions] = useState("");
   const [validatorTruthMapping, setValidatorTruthMapping] = useState<"false-to-true" | "true-to-true" | "true-to-false">("false-to-true");
+  const [validatorMathTruthMapping, setValidatorMathTruthMapping] = useState<"make-true" | "keep-true" | "make-false">("make-true");
   
   // Coherence Meter State
   const [coherenceInputText, setCoherenceInputText] = useState("");
@@ -475,7 +476,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   };
 
   // Text Model Validator Handler
-  const handleValidatorProcess = async (mode: "reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | "truth-isomorphism") => {
+  const handleValidatorProcess = async (mode: "reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | "truth-isomorphism" | "math-truth-select") => {
     if (!validatorInputText.trim()) {
       toast({
         title: "No Input Text",
@@ -503,6 +504,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
           rigorLevel: validatorRigorLevel,
           customInstructions: validatorCustomInstructions,
           truthMapping: validatorTruthMapping,
+          mathTruthMapping: validatorMathTruthMapping,
         }),
       });
 
@@ -2236,8 +2238,8 @@ Generated on: ${new Date().toLocaleString()}`;
             />
           </div>
 
-          {/* Five Main Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          {/* Six Main Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <Button
               onClick={() => {
                 setShowValidatorCustomization(prev => validatorMode === "reconstruction" ? !prev : true);
@@ -2308,6 +2310,24 @@ Generated on: ${new Date().toLocaleString()}`;
               <Shield className="w-6 h-6 mb-2" />
               <span className="font-bold text-lg">TRUTH SELECT</span>
               <span className="text-xs mt-1 text-center opacity-80">Choose truth mapping</span>
+            </Button>
+
+            <Button
+              onClick={() => {
+                setShowValidatorCustomization(prev => validatorMode === "math-truth-select" ? !prev : true);
+                setValidatorMode("math-truth-select");
+              }}
+              className={`flex flex-col items-center justify-center p-6 h-auto ${
+                validatorMode === "math-truth-select" 
+                  ? "bg-indigo-600 hover:bg-indigo-700 text-white" 
+                  : "bg-white dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-300"
+              }`}
+              disabled={validatorLoading}
+              data-testid="button-math-truth-select"
+            >
+              <BarChart3 className="w-6 h-6 mb-2" />
+              <span className="font-bold text-lg">MATH + TRUTH</span>
+              <span className="text-xs mt-1 text-center opacity-80">Formalize with truth control</span>
             </Button>
 
             <Button
@@ -2489,6 +2509,58 @@ Generated on: ${new Date().toLocaleString()}`;
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                       Choose how to handle truth values when mapping to the target domain
                     </p>
+                  </div>
+                </div>
+              )}
+
+              {validatorMode === "math-truth-select" && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Mathematical Framework</label>
+                    <Select value={validatorMathFramework} onValueChange={setValidatorMathFramework}>
+                      <SelectTrigger data-testid="select-math-framework-truth">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="variational-inference">Variational Inference</SelectItem>
+                        <SelectItem value="game-theory">Game Theory</SelectItem>
+                        <SelectItem value="category-theory">Category Theory</SelectItem>
+                        <SelectItem value="dynamical-systems">Dynamical Systems</SelectItem>
+                        <SelectItem value="graph-theory">Graph Theory</SelectItem>
+                        <SelectItem value="optimization">Optimization Problems</SelectItem>
+                        <SelectItem value="probability">Probability Theory</SelectItem>
+                        <SelectItem value="differential-equations">Differential Equations</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Truth-Value Assignment</label>
+                    <Select value={validatorMathTruthMapping} onValueChange={(value: "make-true" | "keep-true" | "make-false") => setValidatorMathTruthMapping(value)}>
+                      <SelectTrigger data-testid="select-math-truth-mapping">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="make-true">MAKE TRUE (Assign values to make formalization true)</SelectItem>
+                        <SelectItem value="keep-true">KEEP TRUE (Assign values preserving truth)</SelectItem>
+                        <SelectItem value="make-false">MAKE FALSE (Assign values to make formalization false)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      Control truth value through semantic value assignment to mathematical constants
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Rigor Level</label>
+                    <Select value={validatorRigorLevel} onValueChange={(value: "sketch" | "semi-formal" | "proof-ready") => setValidatorRigorLevel(value)}>
+                      <SelectTrigger data-testid="select-rigor-level-truth">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sketch">Sketch (Intuitive formalization)</SelectItem>
+                        <SelectItem value="semi-formal">Semi-formal (Notation with explanations)</SelectItem>
+                        <SelectItem value="proof-ready">Proof-ready (Complete formal spec)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               )}
