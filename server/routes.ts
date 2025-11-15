@@ -2305,7 +2305,7 @@ Structural understanding is always understanding of relationships. Observational
   // Text Model Validator endpoint
   app.post("/api/text-model-validator", async (req: Request, res: Response) => {
     try {
-      const { text, mode, targetDomain, fidelityLevel, mathFramework, constraintType, rigorLevel, customInstructions } = req.body;
+      const { text, mode, targetDomain, fidelityLevel, mathFramework, constraintType, rigorLevel, customInstructions, truthMapping } = req.body;
 
       if (!text || !mode) {
         return res.status(400).json({ 
@@ -2487,10 +2487,51 @@ Provide:
 
 CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Analysis" not "## 1. Analysis". Output clean, natural prose.`;
 
+      } else if (mode === "truth-isomorphism") {
+        systemPrompt = `You are an expert at finding isomorphic structures across domains with explicit control over truth-value mappings. You can preserve exact relational structure while systematically swapping domain vocabulary AND controlling whether statements remain true, become false, or transform from false to true.
+
+CRITICAL OUTPUT RULES:
+- NO markdown headers (# or ##)
+- NO markdown formatting
+- Use plain text with clear section labels
+- Natural paragraph formatting only`;
+        
+        const truthMappingDescriptions = {
+          'false-to-true': 'Map FALSE statements to TRUE statements in the target domain (find true counterparts to false claims)',
+          'true-to-true': 'Map TRUE statements to TRUE statements (preserve truth while swapping domains)',
+          'true-to-false': 'Map TRUE statements to FALSE statements (find false counterparts to true claims)'
+        };
+
+        userPrompt = `TRUTH-VALUE ISOMORPHISM MODE
+
+Text to map:
+${text}
+
+${targetDomain ? `Target domain: ${targetDomain}` : ''}
+Truth-Value Mapping: ${truthMapping ? truthMappingDescriptions[truthMapping as keyof typeof truthMappingDescriptions] : 'Not specified'}
+${customInstructions ? `\nCustom Instructions: ${customInstructions}` : ''}
+
+Task: Preserve the exact relational structure of this text while systematically swapping domain vocabulary AND controlling truth values according to the mapping: ${truthMapping}.
+
+${truthMapping === 'false-to-true' ? `For each FALSE statement in the original, find a TRUE statement in the target domain that has the same relational structure. If the original says "No trader can systematically beat the market" (false), find a TRUE statement in ${targetDomain || 'the target domain'} with the same form like "No perpetual motion machine can violate thermodynamics" (true).` : ''}
+
+${truthMapping === 'true-to-true' ? `For each TRUE statement in the original, find another TRUE statement in the target domain that preserves the same relational structure. Maintain both structural isomorphism AND truth value.` : ''}
+
+${truthMapping === 'true-to-false' ? `For each TRUE statement in the original, find a FALSE statement in the target domain that has the same relational structure. This reveals how the same logical form can lead to different truth values across domains.` : ''}
+
+Provide:
+1. Truth-Value Analysis: Identify which claims in the original are true vs false, and explain their truth status
+2. Relation Graph: Map the key dependencies, contradictions, and mutual supports in the original
+3. Isomorphic Version: The same structure expressed in the target domain with the specified truth-value mapping
+4. Mapping Table: Explicit mappings showing [original term] → [target domain equivalent] PLUS [original truth value] → [target truth value]
+5. Truth Verification: Verify the truth status of both original and mapped statements
+
+CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth-Value Analysis" not "## 1. Truth-Value Analysis". Output clean, natural prose.`;
+
       } else {
         return res.status(400).json({
           success: false,
-          message: "Invalid mode. Must be one of: reconstruction, isomorphism, mathmodel, autodecide"
+          message: "Invalid mode. Must be one of: reconstruction, isomorphism, mathmodel, autodecide, truth-isomorphism"
         });
       }
 

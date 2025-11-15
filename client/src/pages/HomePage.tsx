@@ -140,7 +140,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   
   // Text Model Validator State
   const [validatorInputText, setValidatorInputText] = useState("");
-  const [validatorMode, setValidatorMode] = useState<"reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | null>(null);
+  const [validatorMode, setValidatorMode] = useState<"reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | "truth-isomorphism" | null>(null);
   const [validatorOutput, setValidatorOutput] = useState<string>("");
   const [validatorLoading, setValidatorLoading] = useState(false);
   const [validatorTargetDomain, setValidatorTargetDomain] = useState("");
@@ -150,6 +150,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   const [validatorRigorLevel, setValidatorRigorLevel] = useState<"sketch" | "semi-formal" | "proof-ready">("semi-formal");
   const [showValidatorCustomization, setShowValidatorCustomization] = useState(false);
   const [validatorCustomInstructions, setValidatorCustomInstructions] = useState("");
+  const [validatorTruthMapping, setValidatorTruthMapping] = useState<"false-to-true" | "true-to-true" | "true-to-false">("false-to-true");
   
   // Coherence Meter State
   const [coherenceInputText, setCoherenceInputText] = useState("");
@@ -474,7 +475,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   };
 
   // Text Model Validator Handler
-  const handleValidatorProcess = async (mode: "reconstruction" | "isomorphism" | "mathmodel" | "autodecide") => {
+  const handleValidatorProcess = async (mode: "reconstruction" | "isomorphism" | "mathmodel" | "autodecide" | "truth-isomorphism") => {
     if (!validatorInputText.trim()) {
       toast({
         title: "No Input Text",
@@ -501,6 +502,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
           constraintType: validatorConstraintType,
           rigorLevel: validatorRigorLevel,
           customInstructions: validatorCustomInstructions,
+          truthMapping: validatorTruthMapping,
         }),
       });
 
@@ -2234,8 +2236,8 @@ Generated on: ${new Date().toLocaleString()}`;
             />
           </div>
 
-          {/* Four Main Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* Five Main Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <Button
               onClick={() => {
                 setShowValidatorCustomization(prev => validatorMode === "reconstruction" ? !prev : true);
@@ -2288,6 +2290,24 @@ Generated on: ${new Date().toLocaleString()}`;
               <Zap className="w-6 h-6 mb-2" />
               <span className="font-bold text-lg">MATH MODEL</span>
               <span className="text-xs mt-1 text-center opacity-80">Formalize it</span>
+            </Button>
+
+            <Button
+              onClick={() => {
+                setShowValidatorCustomization(prev => validatorMode === "truth-isomorphism" ? !prev : true);
+                setValidatorMode("truth-isomorphism");
+              }}
+              className={`flex flex-col items-center justify-center p-6 h-auto ${
+                validatorMode === "truth-isomorphism" 
+                  ? "bg-orange-600 hover:bg-orange-700 text-white" 
+                  : "bg-white dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-2 border-orange-300"
+              }`}
+              disabled={validatorLoading}
+              data-testid="button-truth-isomorphism"
+            >
+              <Shield className="w-6 h-6 mb-2" />
+              <span className="font-bold text-lg">TRUTH SELECT</span>
+              <span className="text-xs mt-1 text-center opacity-80">Choose truth mapping</span>
             </Button>
 
             <Button
@@ -2437,6 +2457,38 @@ Generated on: ${new Date().toLocaleString()}`;
                         <SelectItem value="proof-ready">Proof-ready (Complete formal spec)</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+              )}
+
+              {validatorMode === "truth-isomorphism" && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Target Domain</label>
+                    <input
+                      type="text"
+                      value={validatorTargetDomain}
+                      onChange={(e) => setValidatorTargetDomain(e.target.value)}
+                      placeholder="e.g., physics, sociology, computer science"
+                      className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                      data-testid="input-target-domain-truth"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Truth-Value Mapping</label>
+                    <Select value={validatorTruthMapping} onValueChange={(value: "false-to-true" | "true-to-true" | "true-to-false") => setValidatorTruthMapping(value)}>
+                      <SelectTrigger data-testid="select-truth-mapping">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="false-to-true">FALSE → TRUE (Map false statements to true ones)</SelectItem>
+                        <SelectItem value="true-to-true">TRUE → TRUE (Preserve truth while swapping domains)</SelectItem>
+                        <SelectItem value="true-to-false">TRUE → FALSE (Map true statements to false ones)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      Choose how to handle truth values when mapping to the target domain
+                    </p>
                   </div>
                 </div>
               )}
