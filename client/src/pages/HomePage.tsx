@@ -152,6 +152,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
   const [validatorCustomInstructions, setValidatorCustomInstructions] = useState("");
   const [validatorTruthMapping, setValidatorTruthMapping] = useState<"false-to-true" | "true-to-true" | "true-to-false">("false-to-true");
   const [validatorMathTruthMapping, setValidatorMathTruthMapping] = useState<"make-true" | "keep-true" | "make-false">("make-true");
+  const [validatorLiteralTruth, setValidatorLiteralTruth] = useState(false);
   
   // Coherence Meter State
   const [coherenceInputText, setCoherenceInputText] = useState("");
@@ -505,6 +506,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
           customInstructions: validatorCustomInstructions,
           truthMapping: validatorTruthMapping,
           mathTruthMapping: validatorMathTruthMapping,
+          literalTruth: validatorLiteralTruth,
         }),
       });
 
@@ -2510,6 +2512,22 @@ Generated on: ${new Date().toLocaleString()}`;
                       Choose how to handle truth values when mapping to the target domain
                     </p>
                   </div>
+                  <div className="flex items-center justify-between p-3 border rounded dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20">
+                    <div>
+                      <label htmlFor="literal-truth-toggle" className="text-sm font-medium cursor-pointer">
+                        Literal Truth Mode
+                      </label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Ensure statements are LITERALLY true (not approximately or qualifiedly true)
+                      </p>
+                    </div>
+                    <Switch
+                      id="literal-truth-toggle"
+                      checked={validatorLiteralTruth}
+                      onCheckedChange={setValidatorLiteralTruth}
+                      data-testid="switch-literal-truth"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -2561,6 +2579,22 @@ Generated on: ${new Date().toLocaleString()}`;
                         <SelectItem value="proof-ready">Proof-ready (Complete formal spec)</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded dark:border-gray-600 bg-blue-50 dark:bg-blue-900/20">
+                    <div>
+                      <label htmlFor="literal-truth-toggle-math" className="text-sm font-medium cursor-pointer">
+                        Literal Truth Mode
+                      </label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Ensure statements are LITERALLY true (not approximately or qualifiedly true)
+                      </p>
+                    </div>
+                    <Switch
+                      id="literal-truth-toggle-math"
+                      checked={validatorLiteralTruth}
+                      onCheckedChange={setValidatorLiteralTruth}
+                      data-testid="switch-literal-truth-math"
+                    />
                   </div>
                 </div>
               )}
