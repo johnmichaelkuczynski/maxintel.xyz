@@ -4,6 +4,17 @@
 This platform analyzes written text to assess the intelligence and cognitive fingerprint of authors using multi-model AI evaluation. It provides document analysis, AI detection, translation, comprehensive cognitive profiling, and intelligent text rewriting capabilities. The project's vision is to offer deep insights into cognitive abilities and thought processes from written content, with advanced features for maximizing intelligence scores through iterative rewriting.
 
 ## Recent Changes
+- **November 15, 2025**: **SIXTH FUNCTION ADDED TO TEXT MODEL VALIDATOR** - Math Truth Select combines mathematical formalization with truth-value control
+  - ✅ **Math + Truth Function**: New indigo-themed button with BarChart3 icon for mathematical formalization with truth-value assignment
+  - ✅ **Three Truth-Value Options**: MAKE TRUE (assign values to make false statements true), KEEP TRUE (preserve truth), MAKE FALSE (transform true to false)
+  - ✅ **Semantic Value Assignment**: AI assigns specific values to mathematical constants to achieve target truth value
+  - ✅ **Comprehensive Output**: Truth analysis, abstract formalization, semantic value assignment, verification, and alternative assignments
+  - ✅ **Full Backend Implementation**: Intelligent prompting with examples for each truth-value option
+  - ✅ **Six-Function Layout**: Grid now displays all 6 functions in 3-column layout
+- **November 15, 2025**: **FIFTH FUNCTION ADDED TO TEXT MODEL VALIDATOR** - Truth Select (Truth-Value Isomorphism) with domain mapping and truth control
+  - ✅ **Truth-Value Isomorphism**: Orange-themed button with Shield icon for domain mapping with truth-value selection
+  - ✅ **Three Mapping Options**: FALSE→TRUE (map false to true), TRUE→TRUE (preserve truth), TRUE→FALSE (map true to false)
+  - ✅ **Full Backend**: AI analyzes original truth values and maps to target domain with specified truth transformation
 - **November 2, 2025**: **MAXIMIZE INTELLIGENCE FUNCTION COMPLETELY REBUILT** - Now produces multi-page, self-contained essays from single-paragraph inputs
   - ✅ **Always Completes to Full Essay**: Any input automatically expanded to complete, self-contained 3-5+ page essay (unless "do not complete" specified)
   - ✅ **Concrete Examples Required**: Prompt demands 5-10+ specific concrete examples throughout (e.g., "PostgreSQL's MVCC implementation" not "consider a database")
