@@ -2653,7 +2653,54 @@ CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth
         ]
       });
 
-      const output = message.content[0].type === 'text' ? message.content[0].text : '';
+      let output = message.content[0].type === 'text' ? message.content[0].text : '';
+
+      // If literal truth mode is enabled, run verification pass
+      if (literalTruth && (mode === 'truth-isomorphism' || mode === 'math-truth-select')) {
+        const verificationPrompt = `You are a strict fact-checker. Review the following output and identify any statements that are NOT literally true (i.e., approximately true, qualifiedly true, or contain unverified absolutes like "all", "every", "always", "never" without proper conditions).
+
+OUTPUT TO VERIFY:
+${output}
+
+TASK:
+1. Identify each statement that is NOT literally true
+2. For each problematic statement, explain WHY it's not literally true
+3. Provide a corrected version that IS literally true
+
+If ALL statements are already literally true, respond with: "VERIFIED: All statements are literally true."
+
+If any statements need correction, respond in this format:
+PROBLEMATIC STATEMENT 1: [quote the statement]
+WHY NOT LITERAL: [explanation]
+CORRECTED: [literally true version]
+
+PROBLEMATIC STATEMENT 2: [quote the statement]
+WHY NOT LITERAL: [explanation]
+CORRECTED: [literally true version]
+
+Be extremely strict - reject any approximations, generalizations, or unqualified universals.`;
+
+        const verificationMessage = await anthropic.messages.create({
+          model: "claude-3-7-sonnet-20250219",
+          max_tokens: 2000,
+          temperature: 0,
+          messages: [
+            {
+              role: "user",
+              content: verificationPrompt
+            }
+          ]
+        });
+
+        const verificationResult = verificationMessage.content[0].type === 'text' ? verificationMessage.content[0].text : '';
+
+        // If verification found issues, append them to the output
+        if (!verificationResult.includes('VERIFIED: All statements are literally true')) {
+          output += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLITERAL TRUTH VERIFICATION REPORT:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${verificationResult}\n\nNOTE: Some statements in the output above were flagged as not literally true. Please review the verification report and use the corrected versions.`;
+        } else {
+          output += `\n\n✅ LITERAL TRUTH VERIFIED: All statements have been confirmed to be literally true.`;
+        }
+      }
 
       res.json({
         success: true,
