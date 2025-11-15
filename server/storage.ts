@@ -34,7 +34,7 @@ export interface IStorage {
   
   // Document operations
   createDocument(doc: InsertDocument): Promise<Document>;
-  getDocumentsByUser(userEmail: string): Promise<Document[]>;
+  getDocumentsByUser(userId: number): Promise<Document[]>;
   
   // Analysis operations
   createAnalysis(analysis: any): Promise<any>;
@@ -46,8 +46,8 @@ export interface IStorage {
   logActivity(activity: InsertUserActivity): Promise<void>;
   
   // Cognitive profile operations
-  getCognitiveProfile(userEmail: string): Promise<any>;
-  updateCognitiveProfile(userEmail: string, profile: Partial<InsertCognitiveProfile>): Promise<void>;
+  getCognitiveProfile(userId: number): Promise<any>;
+  updateCognitiveProfile(userId: number, profile: Partial<InsertCognitiveProfile>): Promise<void>;
   
   // GPT Bypass Humanizer operations
   createRewriteJob(job: InsertRewriteJob): Promise<RewriteJob>;
@@ -104,31 +104,31 @@ export class DatabaseStorage implements IStorage {
     return document;
   }
 
-  async getDocumentsByUser(userEmail: string): Promise<Document[]> {
+  async getDocumentsByUser(userId: number): Promise<Document[]> {
     return await db
       .select()
       .from(documents)
-      .where(eq(documents.userEmail, userEmail));
+      .where(eq(documents.userId, userId));
   }
 
   async logActivity(activity: InsertUserActivity): Promise<void> {
     await db.insert(userActivities).values(activity);
   }
 
-  async getCognitiveProfile(userEmail: string): Promise<any> {
+  async getCognitiveProfile(userId: number): Promise<any> {
     const [profile] = await db
       .select()
       .from(cognitiveProfiles)
-      .where(eq(cognitiveProfiles.userEmail, userEmail));
+      .where(eq(cognitiveProfiles.userId, userId));
     return profile;
   }
 
-  async updateCognitiveProfile(userEmail: string, profile: Partial<InsertCognitiveProfile>): Promise<void> {
+  async updateCognitiveProfile(userId: number, profile: Partial<InsertCognitiveProfile>): Promise<void> {
     await db
       .insert(cognitiveProfiles)
-      .values({ ...profile, userEmail })
+      .values({ ...profile, userId })
       .onConflictDoUpdate({
-        target: cognitiveProfiles.userEmail,
+        target: cognitiveProfiles.userId,
         set: { ...profile, lastUpdated: new Date() }
       });
   }
@@ -153,7 +153,7 @@ export class DatabaseStorage implements IStorage {
   async createRewriteJob(insertJob: InsertRewriteJob): Promise<RewriteJob> {
     const [job] = await db
       .insert(rewriteJobs)
-      .values([insertJob])
+      .values(insertJob)
       .returning();
     return job;
   }

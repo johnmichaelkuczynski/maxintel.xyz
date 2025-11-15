@@ -25,7 +25,7 @@ export const documents = pgTable("documents", {
   originalContent: text("original_content"), // Store original content
   filename: text("filename"),
   mimeType: text("mime_type"),
-  userEmail: text("user_email").references(() => users.email),
+  userId: integer("user_id").references(() => users.id),
   wordCount: integer("word_count"),
   mathNotationCount: integer("math_notation_count"), // Count of LaTeX expressions
   complexity: text("complexity"), // low, medium, high
@@ -39,7 +39,7 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
   originalContent: true,
   filename: true,
   mimeType: true,
-  userEmail: true,
+  userId: true,
   wordCount: true,
   mathNotationCount: true,
   complexity: true,
@@ -49,7 +49,7 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
 export const analyses = pgTable("analyses", {
   id: serial("id").primaryKey(),
   documentId: integer("document_id").references(() => documents.id).notNull(),
-  userEmail: text("user_email").references(() => users.email),
+  userId: integer("user_id").references(() => users.id),
   summary: text("summary").notNull(),
   overallScore: integer("overall_score").notNull(),
   overallAssessment: text("overall_assessment").notNull(),
@@ -61,7 +61,7 @@ export const analyses = pgTable("analyses", {
 
 export const insertAnalysisSchema = createInsertSchema(analyses).pick({
   documentId: true,
-  userEmail: true,
+  userId: true,
   summary: true,
   overallScore: true,
   overallAssessment: true,
@@ -77,7 +77,7 @@ export const intelligentRewrites = pgTable("intelligent_rewrites", {
   rewrittenDocumentId: integer("rewritten_document_id").references(() => documents.id).notNull(),
   originalAnalysisId: integer("original_analysis_id").references(() => analyses.id).notNull(),
   rewrittenAnalysisId: integer("rewritten_analysis_id").references(() => analyses.id).notNull(),
-  userEmail: text("user_email").references(() => users.email),
+  userId: integer("user_id").references(() => users.id),
   provider: text("provider").notNull(),
   customInstructions: text("custom_instructions"),
   originalScore: integer("original_score").notNull(),
@@ -92,7 +92,7 @@ export const insertIntelligentRewriteSchema = createInsertSchema(intelligentRewr
   rewrittenDocumentId: true,
   originalAnalysisId: true,
   rewrittenAnalysisId: true,
-  userEmail: true,
+  userId: true,
   provider: true,
   customInstructions: true,
   originalScore: true,
@@ -108,7 +108,7 @@ export const comparisons = pgTable("comparisons", {
   documentBId: integer("document_b_id").references(() => documents.id).notNull(),
   analysisAId: integer("analysis_a_id").references(() => analyses.id).notNull(),
   analysisBId: integer("analysis_b_id").references(() => analyses.id).notNull(),
-  userEmail: text("user_email").references(() => users.email),
+  userId: integer("user_id").references(() => users.id),
   comparisonResults: jsonb("comparison_results").notNull(),
   improvementSuggestions: jsonb("improvement_suggestions"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -119,7 +119,7 @@ export const insertComparisonSchema = createInsertSchema(comparisons).pick({
   documentBId: true,
   analysisAId: true,
   analysisBId: true,
-  userEmail: true,
+  userId: true,
   comparisonResults: true,
   improvementSuggestions: true,
 });
@@ -128,7 +128,7 @@ export const insertComparisonSchema = createInsertSchema(comparisons).pick({
 export const caseAssessments = pgTable("case_assessments", {
   id: serial("id").primaryKey(),
   documentId: integer("document_id").references(() => documents.id).notNull(),
-  userEmail: text("user_email").references(() => users.email),
+  userId: integer("user_id").references(() => users.id),
   proofEffectiveness: integer("proof_effectiveness").notNull(), // 0-100 score
   claimCredibility: integer("claim_credibility").notNull(), // 0-100 score  
   nonTriviality: integer("non_triviality").notNull(), // 0-100 score
@@ -141,7 +141,7 @@ export const caseAssessments = pgTable("case_assessments", {
 
 export const insertCaseAssessmentSchema = createInsertSchema(caseAssessments).pick({
   documentId: true,
-  userEmail: true,
+  userId: true,
   proofEffectiveness: true,
   claimCredibility: true,
   nonTriviality: true,
@@ -154,7 +154,7 @@ export const insertCaseAssessmentSchema = createInsertSchema(caseAssessments).pi
 // User activity tracking for cognitive pattern analysis
 export const userActivities = pgTable("user_activities", {
   id: serial("id").primaryKey(),
-  userEmail: text("user_email").references(() => users.email),
+  userId: integer("user_id").references(() => users.id),
   activityType: text("activity_type").notNull(), // upload, analyze, compare, search
   activityData: jsonb("activity_data"), // Detailed activity information
   documentId: integer("document_id").references(() => documents.id),
@@ -163,7 +163,7 @@ export const userActivities = pgTable("user_activities", {
 });
 
 export const insertUserActivitySchema = createInsertSchema(userActivities).pick({
-  userEmail: true,
+  userId: true,
   activityType: true,
   activityData: true,
   documentId: true,
@@ -173,7 +173,7 @@ export const insertUserActivitySchema = createInsertSchema(userActivities).pick(
 // Comprehensive cognitive profiles - the core analytics system
 export const cognitiveProfiles = pgTable("cognitive_profiles", {
   id: serial("id").primaryKey(),
-  userEmail: text("user_email").references(() => users.email).unique(),
+  userId: integer("user_id").references(() => users.id).unique(),
   // Writing patterns and intellectual analysis
   writingPatterns: jsonb("writing_patterns"), // Sentence structure, vocabulary, complexity
   intellectualInterests: jsonb("intellectual_interests"), // Topics, subjects, domains
@@ -197,7 +197,7 @@ export const cognitiveProfiles = pgTable("cognitive_profiles", {
 });
 
 export const insertCognitiveProfileSchema = createInsertSchema(cognitiveProfiles).pick({
-  userEmail: true,
+  userId: true,
   writingPatterns: true,
   intellectualInterests: true,
   cognitiveStyle: true,
