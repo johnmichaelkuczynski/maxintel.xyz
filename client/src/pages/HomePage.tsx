@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Brain, Trash2, FileEdit, Loader2, Zap, Clock, Sparkles, Download, Shield, RefreshCw, Upload, FileText, BookOpen, BarChart3, AlertCircle } from "lucide-react";
 import { analyzeDocument, compareDocuments, checkForAI } from "@/lib/analysis";
 import { AnalysisMode, DocumentInput as DocumentInputType, AIDetectionResult, DocumentAnalysis, DocumentComparison } from "@/lib/types";
@@ -85,6 +86,7 @@ const HomePage: React.FC = () => {
   // State for maximize intelligence feature
   const [maximizeIntelligenceModalOpen, setMaximizeIntelligenceModalOpen] = useState(false);
   const [customInstructions, setCustomInstructions] = useState("");
+  const [useExternalKnowledge, setUseExternalKnowledge] = useState(false);
   const [isMaximizeIntelligenceLoading, setIsMaximizeIntelligenceLoading] = useState(false);
   const [rewriteResult, setRewriteResult] = useState<string>("");
   const [rewriteResultsModalOpen, setRewriteResultsModalOpen] = useState(false);
@@ -1333,7 +1335,8 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
         body: JSON.stringify({
           originalText: documentA.content,
           customInstructions: instructionsToUse,
-          provider: selectedProvider === "all" ? "zhi1" : selectedProvider
+          provider: selectedProvider === "all" ? "zhi1" : selectedProvider,
+          useExternalKnowledge: useExternalKnowledge
         }),
       });
 
@@ -2008,6 +2011,25 @@ Generated on: ${new Date().toLocaleString()}`;
           </DialogHeader>
           
           <div className="space-y-4">
+            {/* External Knowledge Toggle */}
+            <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex-1">
+                <Label htmlFor="external-knowledge-main" className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Use External Knowledge (AnalyticPhilosophy.net)
+                </Label>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  When enabled, MAXINTEL fetches research passages and citations from the Zhi knowledge base
+                </p>
+              </div>
+              <Switch
+                id="external-knowledge-main"
+                checked={useExternalKnowledge}
+                onCheckedChange={setUseExternalKnowledge}
+                disabled={isMaximizeIntelligenceLoading}
+                data-testid="toggle-external-knowledge-main"
+              />
+            </div>
+
             <div>
               <label className="text-sm font-medium text-gray-700 mb-2 block">
                 Custom Instructions (optional)
