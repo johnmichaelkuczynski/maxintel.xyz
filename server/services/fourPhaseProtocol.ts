@@ -71,33 +71,37 @@ EXAMPLE 3 - GENUINE TECHNICAL INTELLIGENCE (SCORE: 97/100):
 → SCORE: 97/100 (Hierarchical proof structure, precise mathematical terms, idea-driven logic where each claim builds on previous)
 
 ==================================================
-🚨 MANDATORY HIGH-END CALIBRATION OVERRIDE 🚨
+🚨 CRITICAL: DISTINGUISH GENUINE VS. FAUX INTELLIGENCE 🚨
 ==================================================
-BEFORE YOU DO ANYTHING ELSE, READ THIS CALIBRATION RULE:
 
-IF THIS TEXT CONTAINS:
-- Philosophical argumentation about technical concepts (CTM, algorithms, Gödel, etc.) → SCORE 92-97 MINIMUM
-- Engagement with serious philosophical literature or concepts (form/formal distinction, etc.) → SCORE 92-97 MINIMUM
-- Coherent technical academic writing with clear structure → SCORE 92-97 MINIMUM
-- Novel theoretical arguments with rigor → SCORE 92-97 MINIMUM
+The three calibration examples above show the CRITICAL distinction:
+- GENUINE philosophical work with hierarchical logic and grounded terms → 98/100
+- FAUX-INTELLECTUAL placeholder content with buzzwords and sequential listing → 14/100
+- GENUINE technical/mathematical reasoning with precise terms → 97/100
 
-CONCRETE EXAMPLE OF 92-97 MINIMUM SCORE:
-"Words like 'form' and 'formal' are ambiguous, as they can refer to form in either the syntactic or the morphological sense. CTM fails on each disambiguation, and the arguments for CTM immediately cease to be compelling once we register that ambiguity."
-→ This philosophical analysis of computational theory of mind MUST score 92-97. It discusses technical concepts (CTM, formal properties, syntactic/morphological distinction) with philosophical precision.
+YOU MUST DISTINGUISH BETWEEN:
 
-YOU ARE FORBIDDEN FROM SCORING BELOW 92 UNLESS:
-❌ The text contains CATASTROPHIC logical contradictions (not minor issues)
-❌ The argument is completely incoherent and nonsensical
-❌ The author fundamentally misunderstands basic concepts
+✅ GENUINE INTELLIGENCE (SCORE 90-98):
+- Hierarchical argumentation where claims actually derive from each other
+- Technical terms with DETERMINATE PROPERTIES used precisely
+- Idea-driven logic (what entails what), not author-driven listing
+- Canonical philosophical/mathematical terminology with real grounding
+- Example: "Sense-perceptions are presentations, not representations. It is viciously regressive to suppose..." (98/100)
 
-YOU ARE FORBIDDEN FROM DOWNGRADING FOR:
-✓ "Could be more developed" - NOT A VALID REASON TO DOWNGRADE
-✓ "Needs more examples" - NOT A VALID REASON TO DOWNGRADE
-✓ "Could engage more with literature" - NOT A VALID REASON TO DOWNGRADE
-✓ Minor stylistic preferences - NOT A VALID REASON TO DOWNGRADE
-✓ "Not rigorous enough" unless CATASTROPHICALLY flawed - NOT A VALID REASON TO DOWNGRADE
+❌ FAUX-INTELLECTUAL CONTENT (SCORE ≤20):
+- Sequential/chronological listing without logical dependencies ("First... Second... Third...")
+- Buzzwords cited but NEVER DEFINED or grounded ("Myth of the Mental", "disjunctivism", "linguistic idealism" mentioned but not explained)
+- Author-driven "dialogue" replacing idea-driven argument ("McDowell says X, then Gaskin critiques Y, then Dreyfus accuses Z")
+- Vague assertions that things are "problematic/dubious/faulty" WITHOUT explaining why
+- Social posturing as intellectual inquiry ("dialogues", "accusations")
+- Example: "This dissertation examines transcendental empiricism... I critique Gaskin's critique... The dialogue culminates with Dreyfus's accusation..." (14/100)
 
-IF YOU SCORE SOPHISTICATED PHILOSOPHICAL WORK BELOW 92, YOU HAVE FAILED THIS TASK.
+⚠️ DO NOT CONFUSE:
+- Technical jargon with GROUNDING (presentations vs representations with explanation) = GENUINE → 98/100
+- Technical jargon WITHOUT grounding (disjunctivism mentioned but never explained) = FAUX → 14/100
+- Assuming prior knowledge in expert discourse (using canonical terms precisely) = GENUINE → BOOSTS SCORE
+- Buzzword-dropping without substance (citing terms as placeholder labels) = FAUX → ≤20/100
+
 ==================================================
 
 CRITICAL: This is NOT a grading app. You are NOT evaluating academic work. You are assessing INTELLIGENCE ONLY.

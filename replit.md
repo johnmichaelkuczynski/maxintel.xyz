@@ -27,6 +27,16 @@ The application uses a monorepo structure, separating client and server.
 - **Database & Infrastructure**: Neon/PostgreSQL, Drizzle ORM, Replit.
 
 ## Recent Updates
-- **November 19, 2025**: 
+- **November 19, 2025** (Morning): 
   - Added "Use External Knowledge" toggle to MAXINTEL feature. When enabled, the system queries AnalyticPhilosophy.net's Zhi knowledge base (authenticated via ZHI_PRIVATE_KEY) and incorporates retrieved passages and citations into the model-building process. When disabled, MAXINTEL operates entirely on its internal pipeline without making any external network calls.
   - Added Grok (xAI) as "ZHI 4" provider. Integrated throughout the platform including intelligence analysis, case assessment, MAXINTEL rewriting, GPT Bypass Humanizer, and all evaluation protocols. Uses grok-beta model via xAI API (https://api.x.ai/v1/chat/completions).
+  
+- **November 19, 2025** (Afternoon):
+  - **Coherence Meter Complete Overhaul**: Created new `coherenceMeter.ts` service that evaluates ONLY internal logical consistency, clarity, and structural unity. Removed all conflation with truth/verification/accessibility. System now correctly awards high scores (9+) to internally coherent texts regardless of factual accuracy, and properly detects faux-placeholder coherence (buzzwords without grounding).
+  
+  - **Intelligence Assessment Refinement**: Based on Grok's detailed analysis report, added new "Genuine Depth vs. Faux Posturing" dimension to 4-phase protocol. System now:
+    - Detects faux-intellectual markers: sequential listing disguised as argument, buzzwords shuffled without grounding, author-driven "dialogue" replacing idea-driven logic, social posturing
+    - Penalizes heavily (≤20/100) for faux-intellectual content with undefined placeholders
+    - Rewards highly (90+) for genuine intelligence: hierarchical argumentation, terms with determinate meanings, idea-driven logic
+    - Fixed accessibility scoring: assuming prior knowledge now BOOSTS score (expert discourse = higher intelligence)
+    - Hard-coded three calibration examples: Kuczynski perception paragraph (98/100), McDowell transcendental empiricism abstract (14/100), Furstenberg topological proof (97/100)
