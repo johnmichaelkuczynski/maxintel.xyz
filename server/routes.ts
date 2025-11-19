@@ -52,6 +52,7 @@ function mapZhiToProvider(zhiName: string): string {
     'zhi1': 'openai',
     'zhi2': 'anthropic', 
     'zhi3': 'deepseek',
+    'zhi4': 'grok'
   };
   return mapping[zhiName] || zhiName;
 }
@@ -475,6 +476,7 @@ export async function registerRoutes(app: Express): Promise<Express> {
     const anthropic_key = process.env.ANTHROPIC_API_KEY;
     const deepseek_key = process.env.DEEPSEEK_API_KEY;
     const perplexity_key = process.env.PERPLEXITY_API_KEY;
+    const grok_key = process.env.GROK_API_KEY;
     const mathpix_app_id = process.env.MATHPIX_APP_ID;
     const mathpix_app_key = process.env.MATHPIX_APP_KEY;
     
@@ -486,6 +488,7 @@ export async function registerRoutes(app: Express): Promise<Express> {
         anthropic: anthropic_key ? "configured" : "missing",
         deepseek: deepseek_key ? "configured" : "missing",
         perplexity: perplexity_key ? "configured" : "missing",
+        grok: grok_key ? "configured" : "missing",
         mathpix: (mathpix_app_id && mathpix_app_key) ? "configured" : "missing"
       }
     });
@@ -496,6 +499,7 @@ export async function registerRoutes(app: Express): Promise<Express> {
       anthropic: anthropic_key ? "✓" : "✗", 
       deepseek: deepseek_key ? "✓" : "✗",
       perplexity: perplexity_key ? "✓" : "✗",
+      grok: grok_key ? "✓" : "✗",
       mathpix: (mathpix_app_id && mathpix_app_key) ? "✓" : "✗"
     });
   });

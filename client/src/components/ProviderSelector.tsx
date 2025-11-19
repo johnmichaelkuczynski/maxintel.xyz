@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { BrainCircuit, Bot, Sparkles, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-export type LLMProvider = "zhi1" | "zhi2" | "zhi3" | "all";
+export type LLMProvider = "zhi1" | "zhi2" | "zhi3" | "zhi4" | "all";
 
 interface ProviderSelectorProps {
   selectedProvider: LLMProvider;
@@ -74,7 +74,7 @@ const ProviderSelector: React.FC<ProviderSelectorProps> = ({
               </div>
             </SelectItem>
           )}
-          {apiStatus.perplexity && (
+          {apiStatus.deepseek && (
             <SelectItem 
               value="zhi3" 
               className="flex items-center"
@@ -82,6 +82,17 @@ const ProviderSelector: React.FC<ProviderSelectorProps> = ({
               <div className="flex items-center gap-2">
                 <Bot className="h-4 w-4 text-orange-600" />
                 <span>ZHI 3</span>
+              </div>
+            </SelectItem>
+          )}
+          {apiStatus.grok && (
+            <SelectItem 
+              value="zhi4" 
+              className="flex items-center"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-blue-600" />
+                <span>ZHI 4</span>
               </div>
             </SelectItem>
           )}

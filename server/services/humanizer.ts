@@ -6,7 +6,7 @@ function mapZhiToProvider(zhiName: string): string {
     'zhi1': 'openai',
     'zhi2': 'anthropic', 
     'zhi3': 'deepseek',
-    'zhi4': 'perplexity'
+    'zhi4': 'grok'
   };
   return mapping[zhiName] || zhiName;
 }

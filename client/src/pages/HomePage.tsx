@@ -923,11 +923,13 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
     anthropic: boolean;
     perplexity: boolean;
     deepseek: boolean;
+    grok: boolean;
   }>({
     openai: false,
     anthropic: false,
     perplexity: false,
-    deepseek: false
+    deepseek: false,
+    grok: false
   });
   
   // Check API status when component mounts
@@ -942,7 +944,8 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
             openai: data.api_keys.openai === "configured",
             anthropic: data.api_keys.anthropic === "configured",
             perplexity: data.api_keys.perplexity === "configured",
-            deepseek: data.api_keys.deepseek === "configured"
+            deepseek: data.api_keys.deepseek === "configured",
+            grok: data.api_keys.grok === "configured"
           });
           
           console.log("API Status:", data.api_keys);
@@ -1004,7 +1007,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-
+      'zhi4': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -1157,7 +1160,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-
+      'zhi4': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -1212,7 +1215,7 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-
+      'zhi4': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -1461,7 +1464,7 @@ Generated on: ${new Date().toLocaleString()}`;
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-
+      'zhi4': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
