@@ -11,7 +11,16 @@ interface ZhiQueryResponse {
     relevance: number;
     tokens: number;
   }>;
-  quotes?: Array<any>;
+  quotes?: Array<{
+    text: string;
+    citation: {
+      author: string;
+      work: string;
+      chunkIndex: number;
+    };
+    relevance: number;
+    tokens: number;
+  }>;
   meta?: {
     resultsReturned: number;
     limitApplied: number;
@@ -59,19 +68,33 @@ export async function queryZhiKnowledgeBase(
 
     const data = await response.json() as ZhiQueryResponse;
     
-    if (data.results && data.results.length > 0) {
-      console.log(`✓ Retrieved ${data.results.length} passages from Zhi knowledge base`);
+    // Prioritize actual quotes over excerpts
+    if (data.quotes && data.quotes.length > 0) {
+      console.log(`✓ Retrieved ${data.quotes.length} quotes from Zhi knowledge base`);
       
-      const formattedPassages = data.results
-        .map((result, i) => 
-          `[${i + 1}] "${result.excerpt}"\n   — ${result.citation.author}, ${result.citation.work}`
+      const formattedQuotes = data.quotes
+        .map((quote, i) => 
+          `[${i + 1}] "${quote.text}"\n   — ${quote.citation.author}, ${quote.citation.work}`
         )
         .join('\n\n');
       
-      return formattedPassages;
+      return formattedQuotes;
     }
     
-    console.log('Zhi API returned no results');
+    // Fall back to excerpts if no quotes available
+    if (data.results && data.results.length > 0) {
+      console.log(`✓ Retrieved ${data.results.length} excerpts from Zhi knowledge base (no verbatim quotes found)`);
+      
+      const formattedExcerpts = data.results
+        .map((result, i) => 
+          `[${i + 1}] ${result.excerpt}\n   — ${result.citation.author}, ${result.citation.work} (excerpt)`
+        )
+        .join('\n\n');
+      
+      return formattedExcerpts;
+    }
+    
+    console.log('Zhi API returned no quotes or results');
     return null;
   } catch (error) {
     console.error('Error querying Zhi knowledge base:', error);
