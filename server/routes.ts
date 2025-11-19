@@ -573,7 +573,7 @@ export async function registerRoutes(app: Express): Promise<Express> {
   // INTELLIGENT REWRITE - Maximize intelligence scores on protocol questions
   app.post("/api/intelligent-rewrite", async (req: Request, res: Response) => {
     try {
-      const { originalText, customInstructions, provider = 'zhi1' } = req.body;
+      const { originalText, customInstructions, provider = 'zhi1', useExternalKnowledge = false } = req.body;
 
       if (!originalText || typeof originalText !== 'string') {
         return res.status(400).json({ 
@@ -584,12 +584,14 @@ export async function registerRoutes(app: Express): Promise<Express> {
       console.log(`Starting intelligent rewrite with ${provider}...`);
       console.log(`Original text length: ${originalText.length} characters`);
       console.log(`Custom instructions: ${customInstructions || 'None'}`);
+      console.log(`External knowledge: ${useExternalKnowledge ? 'ENABLED' : 'DISABLED'}`);
       
       const { performIntelligentRewrite } = await import('./services/intelligentRewrite');
       const result = await performIntelligentRewrite({
         text: originalText,
         customInstructions,
-        provider
+        provider,
+        useExternalKnowledge
       });
       
       res.json({

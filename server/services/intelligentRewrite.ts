@@ -1,12 +1,72 @@
 import { executeFourPhaseProtocol } from './fourPhaseProtocol';
+import fetch from 'node-fetch';
 
 type LLMProvider = 'openai' | 'anthropic' | 'perplexity' | 'deepseek';
+
+interface ZhiQueryResponse {
+  success: boolean;
+  passages?: Array<{
+    text: string;
+    source: string;
+    relevance: number;
+  }>;
+  error?: string;
+}
+
+async function queryZhiKnowledgeBase(text: string): Promise<string | null> {
+  const zhiPrivateKey = process.env.ZHI_PRIVATE_KEY;
+  
+  if (!zhiPrivateKey) {
+    console.warn('ZHI_PRIVATE_KEY not configured - skipping external knowledge query');
+    return null;
+  }
+
+  try {
+    console.log('Querying AnalyticPhilosophy.net Zhi knowledge base...');
+    
+    const response = await fetch('https://analyticphilosophy.net/zhi/query', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${zhiPrivateKey}`
+      },
+      body: JSON.stringify({
+        query: text,
+        maxPassages: 5
+      })
+    });
+
+    if (!response.ok) {
+      console.error(`Zhi API error: ${response.status} ${response.statusText}`);
+      return null;
+    }
+
+    const data = await response.json() as ZhiQueryResponse;
+    
+    if (data.success && data.passages && data.passages.length > 0) {
+      console.log(`Retrieved ${data.passages.length} passages from Zhi knowledge base`);
+      
+      const formattedPassages = data.passages
+        .map((p, i) => `[${i + 1}] ${p.text}\n   Source: ${p.source}`)
+        .join('\n\n');
+      
+      return `\n\nEXTERNAL KNOWLEDGE FROM ZHI DATABASE:\n${formattedPassages}\n`;
+    }
+    
+    console.log('No relevant passages found in Zhi knowledge base');
+    return null;
+  } catch (error) {
+    console.error('Error querying Zhi knowledge base:', error);
+    return null;
+  }
+}
 
 interface IntelligentRewriteRequest {
   text: string;
   customInstructions?: string;
   styleSample?: string;
   provider: LLMProvider;
+  useExternalKnowledge?: boolean;
 }
 
 interface IntelligentRewriteResult {
@@ -70,19 +130,25 @@ function isFiction(text: string): boolean {
 }
 
 export async function performIntelligentRewrite(request: IntelligentRewriteRequest): Promise<IntelligentRewriteResult> {
-  const { text, customInstructions, styleSample, provider: rawProvider } = request;
+  const { text, customInstructions, styleSample, provider: rawProvider, useExternalKnowledge } = request;
   const provider = mapZhiToProvider(rawProvider) as LLMProvider;
   
-  console.log(`Starting intelligent rewrite with ${provider}`);
+  console.log(`Starting intelligent rewrite with ${provider}${useExternalKnowledge ? ' (with external knowledge)' : ''}`);
   
-  // Step 1: Get baseline score using 4-phase protocol
-  console.log('Step 1: Evaluating original text...');
+  // Step 1: Query external knowledge base if enabled
+  let externalKnowledge: string | null = null;
+  if (useExternalKnowledge) {
+    externalKnowledge = await queryZhiKnowledgeBase(text);
+  }
+  
+  // Step 2: Get baseline score using 4-phase protocol
+  console.log('Step 2: Evaluating original text...');
   const originalEvaluation = await executeFourPhaseProtocol(text, provider);
   const originalScore = originalEvaluation.overallScore;
   
   console.log(`Original score: ${originalScore}/100`);
   
-  // Step 2: Determine style sample to use
+  // Step 3: Determine style sample to use
   const effectiveStyleSample = styleSample || DEFAULT_STYLE_SAMPLES.philosophical;
   
   // Step 3: Detect if fragment and needs completion (ALWAYS complete unless user explicitly says not to)
@@ -95,6 +161,7 @@ export async function performIntelligentRewrite(request: IntelligentRewriteReque
 
 TARGET STYLE SAMPLES (MATCH THIS WRITING STYLE):
 ${effectiveStyleSample}
+${externalKnowledge || ''}
 
 🎯 CRITICAL SUCCESS CRITERIA:
 
