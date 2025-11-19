@@ -83,11 +83,6 @@ CALIBRATION EXAMPLES:
   });
 
   const output = message.content[0].type === 'text' ? message.content[0].text : '';
-  
-  // Debug: Print first 500 characters of output
-  console.log("=== COHERENCE METER LLM OUTPUT (first 500 chars) ===");
-  console.log(output.substring(0, 500));
-  console.log("=== END DEBUG ===\n");
 
   const internalLogicMatch = output.match(/INTERNAL LOGIC SCORE:\s*(\d+(?:\.\d+)?)\/10/i);
   const clarityMatch = output.match(/CLARITY SCORE:\s*(\d+(?:\.\d+)?)\/10/i);
