@@ -40,3 +40,8 @@ The application uses a monorepo structure, separating client and server.
     - Rewards highly (90+) for genuine intelligence: hierarchical argumentation, terms with determinate meanings, idea-driven logic
     - Fixed accessibility scoring: assuming prior knowledge now BOOSTS score (expert discourse = higher intelligence)
     - Hard-coded three calibration examples: Kuczynski perception paragraph (98/100), McDowell transcendental empiricism abstract (14/100), Furstenberg topological proof (97/100)
+
+- **November 19, 2025** (Evening):
+  - **AI Chat Assistant Conversation Memory**: Implemented full conversation history tracking. Chat now maintains the last 10 messages and includes them in each LLM request, enabling multi-turn contextual conversations.
+  - **AI Chat Assistant Zhi Database Integration**: Added "Zhi Database" toggle to chat interface. When enabled, queries AnalyticPhilosophy.net's knowledge base for relevant passages and includes them in the AI's context, providing access to Kuczynski quotes and philosophical content.
+  - **New API Endpoint**: Created `/api/chat-with-memory` endpoint that handles conversation history, Zhi database queries, and supports all four LLM providers (ZHI 1-4).
