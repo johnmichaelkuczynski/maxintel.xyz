@@ -1304,42 +1304,8 @@ export async function registerRoutes(app: Express): Promise<Express> {
       // Query Zhi database if enabled
       let externalKnowledge = null;
       if (useExternalKnowledge) {
-        const zhiPrivateKey = process.env.ZHI_PRIVATE_KEY;
-        
-        if (zhiPrivateKey) {
-          try {
-            console.log('Querying AnalyticPhilosophy.net Zhi knowledge base for chat...');
-            const zhiResponse = await fetch('https://analyticphilosophy.net/zhi/query', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${zhiPrivateKey}`
-              },
-              body: JSON.stringify({
-                query: message,
-                maxPassages: 5
-              })
-            });
-
-            if (!zhiResponse.ok) {
-              console.error(`Zhi API error: ${zhiResponse.status} ${zhiResponse.statusText}`);
-              const errorText = await zhiResponse.text();
-              console.error(`Zhi API error details: ${errorText}`);
-            } else {
-              const zhiData: any = await zhiResponse.json();
-              if (zhiData.success && zhiData.passages && zhiData.passages.length > 0) {
-                console.log(`Retrieved ${zhiData.passages.length} passages from Zhi knowledge base`);
-                externalKnowledge = zhiData.passages
-                  .map((p: any, i: number) => `[${i + 1}] ${p.text}\n   Source: ${p.source}`)
-                  .join('\n\n');
-              } else {
-                console.log('Zhi API returned no passages or unsuccessful response');
-              }
-            }
-          } catch (error) {
-            console.error('Error querying Zhi knowledge base:', error);
-          }
-        }
+        const { queryZhiKnowledgeBase } = await import('./services/zhiApi');
+        externalKnowledge = await queryZhiKnowledgeBase(message, 5);
       }
 
       // Build system message with context
