@@ -1283,6 +1283,183 @@ export async function registerRoutes(app: Express): Promise<Express> {
       });
     }
   });
+
+  app.post("/api/chat-with-memory", async (req: Request, res: Response) => {
+    try {
+      const { 
+        message, 
+        conversationHistory = [], 
+        currentDocument, 
+        analysisResults, 
+        provider = "zhi1",
+        useExternalKnowledge = false 
+      } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      console.log(`Chat with memory - ${provider}, history: ${conversationHistory.length} messages, external knowledge: ${useExternalKnowledge}`);
+
+      // Query Zhi database if enabled
+      let externalKnowledge = null;
+      if (useExternalKnowledge) {
+        const zhiPrivateKey = process.env.ZHI_PRIVATE_KEY;
+        
+        if (zhiPrivateKey) {
+          try {
+            console.log('Querying AnalyticPhilosophy.net Zhi knowledge base for chat...');
+            const zhiResponse = await fetch('https://analyticphilosophy.net/zhi/query', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${zhiPrivateKey}`
+              },
+              body: JSON.stringify({
+                query: message,
+                maxPassages: 5
+              })
+            });
+
+            if (zhiResponse.ok) {
+              const zhiData: any = await zhiResponse.json();
+              if (zhiData.success && zhiData.passages && zhiData.passages.length > 0) {
+                console.log(`Retrieved ${zhiData.passages.length} passages from Zhi knowledge base`);
+                externalKnowledge = zhiData.passages
+                  .map((p: any, i: number) => `[${i + 1}] ${p.text}\n   Source: ${p.source}`)
+                  .join('\n\n');
+              }
+            }
+          } catch (error) {
+            console.error('Error querying Zhi knowledge base:', error);
+          }
+        }
+      }
+
+      // Build system message with context
+      let systemMessage = "You are an intelligent AI assistant with expertise in philosophy, cognitive science, and academic writing. Provide thoughtful, accurate, and well-sourced responses.";
+      
+      if (externalKnowledge) {
+        systemMessage += `\n\nEXTERNAL KNOWLEDGE FROM ZHI DATABASE:\n${externalKnowledge}`;
+      }
+      
+      if (currentDocument) {
+        systemMessage += `\n\nCURRENT DOCUMENT CONTEXT:\n${currentDocument}`;
+      }
+      
+      if (analysisResults) {
+        systemMessage += `\n\nANALYSIS RESULTS CONTEXT:\n${JSON.stringify(analysisResults, null, 2)}`;
+      }
+
+      // Map provider to actual LLM
+      const providerMap: Record<string, string> = {
+        'zhi1': 'openai',
+        'zhi2': 'anthropic',
+        'zhi3': 'deepseek',
+        'zhi4': 'grok'
+      };
+      const actualProvider = providerMap[provider] || provider;
+
+      // Build messages array with conversation history
+      const messages = conversationHistory.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      // Add current message
+      messages.push({
+        role: 'user',
+        content: message
+      });
+
+      // Make LLM request with conversation history
+      let content;
+      
+      if (actualProvider === 'openai') {
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            messages: [
+              { role: 'system', content: systemMessage },
+              ...messages
+            ],
+            temperature: 0.7,
+            max_tokens: 4000
+          }),
+        });
+
+        const openaiData = await openaiResponse.json();
+        content = openaiData.choices?.[0]?.message?.content || "No response";
+        
+      } else if (actualProvider === 'anthropic') {
+        const anthropic = (await import('@anthropic-ai/sdk')).default;
+        const client = new anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+        
+        const claudeResponse = await client.messages.create({
+          model: 'claude-3-7-sonnet-20250219',
+          max_tokens: 4000,
+          system: systemMessage,
+          messages: messages
+        });
+        
+        content = claudeResponse.content[0].type === 'text' ? claudeResponse.content[0].text : "No response";
+        
+      } else if (actualProvider === 'deepseek') {
+        const deepseekResponse = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [
+              { role: 'system', content: systemMessage },
+              ...messages
+            ],
+            temperature: 0.7
+          }),
+        });
+
+        const deepseekData = await deepseekResponse.json();
+        content = deepseekData.choices?.[0]?.message?.content || "No response";
+        
+      } else if (actualProvider === 'grok') {
+        const grokResponse = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'grok-beta',
+            messages: [
+              { role: 'system', content: systemMessage },
+              ...messages
+            ],
+            temperature: 0.7
+          }),
+        });
+
+        const grokData = await grokResponse.json();
+        content = grokData.choices?.[0]?.message?.content || "No response";
+      }
+
+      return res.json({ content });
+      
+    } catch (error: any) {
+      console.error("Error in chat with memory:", error);
+      return res.status(500).json({ 
+        error: true, 
+        message: error.message || "Failed to process chat message" 
+      });
+    }
+  });
   
   app.post("/api/semantic-analysis", async (req: Request, res: Response) => {
     try {

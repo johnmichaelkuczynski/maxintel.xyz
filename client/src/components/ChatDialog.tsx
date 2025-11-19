@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Upload, Download, Mail, FileText, Paperclip, ArrowUpToLine } from 'lucide-react';
+import { Send, Upload, Download, Mail, FileText, Paperclip, ArrowUpToLine, Database } from 'lucide-react';
 import { MathRenderer } from './MathRenderer';
 import CopyButton from '@/components/CopyButton';
 import SendToButton from '@/components/SendToButton';
@@ -52,6 +54,7 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({
   const [inputMessage, setInputMessage] = useState<string>("");
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider>("zhi1");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [useExternalKnowledge, setUseExternalKnowledge] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -109,30 +112,29 @@ export const ChatDialog: React.FC<ChatDialogProps> = ({
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentQuestion = inputMessage;
     setInputMessage("");
     setIsLoading(true);
 
     try {
-      // Prepare context with current document and analysis
-      let contextualMessage = inputMessage;
-      if (currentDocument || analysisResults) {
-        contextualMessage = `
-Context Information:
-${currentDocument ? `Current Document: ${currentDocument.substring(0, 1000)}...` : ''}
-${analysisResults ? `Analysis Results: ${JSON.stringify(analysisResults, null, 2)}` : ''}
+      // Build conversation history for API (only last 10 messages to avoid context overflow)
+      const conversationHistory = messages.slice(-10).map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
 
-User Question: ${inputMessage}
-        `.trim();
-      }
-
-      const response = await fetch('/api/direct-model-request', {
+      const response = await fetch('/api/chat-with-memory', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          instruction: contextualMessage,
-          provider: selectedProvider
+          message: currentQuestion,
+          conversationHistory: conversationHistory,
+          currentDocument: currentDocument?.substring(0, 2000),
+          analysisResults: analysisResults,
+          provider: selectedProvider,
+          useExternalKnowledge: useExternalKnowledge
         }),
       });
 
@@ -330,7 +332,19 @@ User Question: ${inputMessage}
             <Send className="h-5 w-5" />
             <span>AI Chat Assistant</span>
           </span>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Database className={`h-4 w-4 ${useExternalKnowledge ? 'text-blue-600' : 'text-gray-400'}`} />
+              <Label htmlFor="chat-external-knowledge" className="text-sm cursor-pointer">
+                Zhi Database
+              </Label>
+              <Switch
+                id="chat-external-knowledge"
+                checked={useExternalKnowledge}
+                onCheckedChange={setUseExternalKnowledge}
+                data-testid="toggle-chat-external-knowledge"
+              />
+            </div>
             <Select value={selectedProvider} onValueChange={(value: LLMProvider) => setSelectedProvider(value)}>
               <SelectTrigger className="w-40">
                 <SelectValue />
