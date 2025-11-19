@@ -2972,7 +2972,7 @@ Be extremely strict - reject any approximations, generalizations, or unqualified
             console.log(`Verification attempt ${verificationAttempts} failed. Regenerating with corrections...`);
             
             // Apply corrections from verification
-            const correctionRegex = /CORRECTED: (.+?)(?=\n\n|$)/gs;
+            const correctionRegex = /CORRECTED: ([\s\S]+?)(?=\n\n|$)/g;
             const corrections = [];
             let match;
             while ((match = correctionRegex.exec(verificationResult)) !== null) {

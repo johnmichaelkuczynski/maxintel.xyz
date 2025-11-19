@@ -24,11 +24,23 @@ function parseZhiPrivateKey(privateKey: string): ZhiCredentials | null {
       return { appId: parsed.appId, secretKey: parsed.secretKey };
     }
   } catch {
-    // Try colon-separated format: appId:secretKey
+    // Not JSON, try other formats
+  }
+  
+  // Try colon-separated format: appId:secretKey
+  if (privateKey.includes(':')) {
     const parts = privateKey.split(':');
     if (parts.length === 2) {
       return { appId: parts[0], secretKey: parts[1] };
     }
+  }
+  
+  // If it's a single hex string, use it as secretKey with default appId
+  if (/^[a-f0-9]{60,}$/i.test(privateKey.trim())) {
+    return { 
+      appId: 'default',
+      secretKey: privateKey.trim()
+    };
   }
   
   return null;
@@ -41,8 +53,13 @@ function generateSignature(
   nonce: string,
   queryText: string
 ): string {
-  // Create signature string: appId|timestamp|nonce|query
-  const signatureString = `${appId}|${timestamp}|${nonce}|${queryText}`;
+  // Standard HMAC signature format: Method + URI + Timestamp + Nonce + Body
+  const method = 'POST';
+  const uri = '/zhi/query';
+  const body = JSON.stringify({ query: queryText, maxPassages: 5 });
+  
+  // Build signature string matching common API patterns
+  const signatureString = `${method}\n${uri}\n${timestamp}\n${nonce}\n${body}`;
   
   // Generate HMAC-SHA256 signature
   const hmac = crypto.createHmac('sha256', secretKey);
@@ -71,7 +88,7 @@ export async function queryZhiKnowledgeBase(
     console.log('Querying AnalyticPhilosophy.net Zhi knowledge base...');
     
     // Generate authentication parameters
-    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const timestamp = Date.now().toString(); // Use milliseconds
     const nonce = crypto.randomBytes(16).toString('hex');
     const signature = generateSignature(
       credentials.appId,
