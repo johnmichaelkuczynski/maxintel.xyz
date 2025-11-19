@@ -1,7 +1,7 @@
 import { executeFourPhaseProtocol } from './fourPhaseProtocol';
 import fetch from 'node-fetch';
 
-type LLMProvider = 'openai' | 'anthropic' | 'perplexity' | 'deepseek';
+type LLMProvider = 'openai' | 'anthropic' | 'perplexity' | 'deepseek' | 'grok';
 
 interface ZhiQueryResponse {
   success: boolean;
@@ -85,6 +85,7 @@ function mapZhiToProvider(zhiName: string): string {
     'zhi1': 'openai',
     'zhi2': 'anthropic', 
     'zhi3': 'deepseek',
+    'zhi4': 'grok'
   };
   return mapping[zhiName] || zhiName;
 }
@@ -267,6 +268,23 @@ COMPLETE ${isTextFiction ? 'STORY' : 'ESSAY'}:`;
         },
         body: JSON.stringify({
           model: "deepseek-chat",
+          messages: [{ role: "user", content: basePrompt }],
+          temperature: 0.3,
+          max_tokens: 8000
+        })
+      });
+      
+      const data: any = await response.json();
+      rewrittenText = data.choices[0]?.message?.content || '';
+    } else if (provider === 'grok') {
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: "grok-beta",
           messages: [{ role: "user", content: basePrompt }],
           temperature: 0.3,
           max_tokens: 8000

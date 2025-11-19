@@ -237,8 +237,51 @@ Then provide detailed analysis organized into sections:
         }
       }
     }
+  } else if (provider === 'grok') {
+    // ZHI 4: Grok streaming
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'grok-beta',
+        messages: [{ role: 'user', content: prompt }],
+        stream: true,
+        max_tokens: 4000,
+        temperature: 0.7,
+      }),
+    });
+
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') continue;
+          
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content || '';
+            if (content) {
+              res.write(content);
+              (res as any).flush?.();
+            }
+          } catch (e) {}
+        }
+      }
+    }
   } else if (provider === 'perplexity') {
-    // ZHI 4: Perplexity streaming
+    // Perplexity streaming
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -416,8 +459,51 @@ Provide detailed analysis of literary merit, character development, plot structu
         }
       }
     }
+  } else if (provider === 'grok') {
+    // ZHI 4: Grok streaming
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'grok-beta',
+        messages: [{ role: 'user', content: prompt }],
+        stream: true,
+        max_tokens: 4000,
+        temperature: 0.7,
+      }),
+    });
+
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') continue;
+          
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content || '';
+            if (content) {
+              res.write(content);
+              (res as any).flush?.();
+            }
+          } catch (e) {}
+        }
+      }
+    }
   } else if (provider === 'perplexity') {
-    // ZHI 4: Perplexity streaming
+    // Perplexity streaming
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
