@@ -1631,8 +1631,31 @@ Generated on: ${new Date().toLocaleString()}`;
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Intelligence Analysis Tool</h1>
-        <p className="text-gray-600">Analyze, compare, and enhance writing samples with AI-powered intelligence evaluation</p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Intelligence Analysis Tool</h1>
+            <p className="text-gray-600">Analyze, compare, and enhance writing samples with AI-powered intelligence evaluation</p>
+          </div>
+          
+          {/* External Knowledge Toggle - TOP RIGHT */}
+          <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border-2 border-blue-300 dark:border-blue-700 shadow-md min-w-[320px]">
+            <div className="flex-1">
+              <div className="text-sm font-bold text-blue-900 dark:text-blue-100">
+                Use External Knowledge
+              </div>
+              <div className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+                AnalyticPhilosophy.net Zhi
+              </div>
+            </div>
+            <Switch
+              id="global-external-knowledge"
+              checked={useExternalKnowledge}
+              onCheckedChange={setUseExternalKnowledge}
+              className="data-[state=checked]:bg-blue-600"
+              data-testid="toggle-external-knowledge-global"
+            />
+          </div>
+        </div>
       </header>
 
       {/* Analysis Mode Selector */}
