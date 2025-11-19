@@ -1,12 +1,24 @@
 import fetch from 'node-fetch';
 
 interface ZhiQueryResponse {
-  success: boolean;
-  passages?: Array<{
-    text: string;
-    source: string;
+  results?: Array<{
+    excerpt: string;
+    citation: {
+      author: string;
+      work: string;
+      chunkIndex: number;
+    };
     relevance: number;
+    tokens: number;
   }>;
+  quotes?: Array<any>;
+  meta?: {
+    resultsReturned: number;
+    limitApplied: number;
+    queryProcessed: string;
+    filters: any;
+    timestamp: number;
+  };
   error?: string;
 }
 
@@ -47,17 +59,19 @@ export async function queryZhiKnowledgeBase(
 
     const data = await response.json() as ZhiQueryResponse;
     
-    if (data.success && data.passages && data.passages.length > 0) {
-      console.log(`✓ Retrieved ${data.passages.length} passages from Zhi knowledge base`);
+    if (data.results && data.results.length > 0) {
+      console.log(`✓ Retrieved ${data.results.length} passages from Zhi knowledge base`);
       
-      const formattedPassages = data.passages
-        .map((p, i) => `[${i + 1}] ${p.text}\n   Source: ${p.source}`)
+      const formattedPassages = data.results
+        .map((result, i) => 
+          `[${i + 1}] "${result.excerpt}"\n   — ${result.citation.author}, ${result.citation.work}`
+        )
         .join('\n\n');
       
       return formattedPassages;
     }
     
-    console.log('Zhi API returned no passages or unsuccessful response');
+    console.log('Zhi API returned no results');
     return null;
   } catch (error) {
     console.error('Error querying Zhi knowledge base:', error);
