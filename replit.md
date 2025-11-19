@@ -15,7 +15,7 @@ The application uses a monorepo structure, separating client and server.
     - **4-Phase Intelligence Evaluation System**: Initial Assessment, Deep analytical questioning across 17 cognitive dimensions, Revision and reconciliation, and Final pushback for scores under 95/100.
     - **Seven Core Cognitive Dimensions**: Conceptual Depth, Inferential Control, Semantic Compression, Novel Abstraction, Cognitive Risk, Authenticity, Symbolic Manipulation.
     - **Genre-Aware Assessment**: Supports various document types (philosophical, empirical, technical, fiction).
-    - **Intelligent Rewrite Function**: Recursively optimizes text to maximize intelligence scores, supporting custom instructions.
+    - **Intelligent Rewrite Function (MAXINTEL)**: Recursively optimizes text to maximize intelligence scores, supporting custom instructions and optional external knowledge integration from AnalyticPhilosophy.net Zhi database.
     - **GPT Bypass Humanizer**: Achieves 100% AI to 0% AI transformation through surgical precision style replication.
     - **Coherence Meter**: Offers two processing strategies (simple chunking, outline-guided) with adjustable aggressiveness levels (Conservative, Moderate, Aggressive).
     - **Text Model Validator**: Includes "Truth Select" for truth-value isomorphism and "Math Truth Select" for mathematical formalization with truth-value control, both supporting literal truth verification.
@@ -23,5 +23,8 @@ The application uses a monorepo structure, separating client and server.
 
 ## External Dependencies
 - **AI Service Providers**: OpenAI API (GPT-4), Anthropic API (Claude), Perplexity AI, DeepSeek API.
-- **Supporting Services**: Mathpix OCR, AssemblyAI, SendGrid, Google Custom Search, Stripe (for credit purchases).
+- **Supporting Services**: Mathpix OCR, AssemblyAI, SendGrid, Google Custom Search, Stripe (for credit purchases), AnalyticPhilosophy.net Zhi API (for external knowledge queries).
 - **Database & Infrastructure**: Neon/PostgreSQL, Drizzle ORM, Replit.
+
+## Recent Updates
+- **November 19, 2025**: Added "Use External Knowledge" toggle to MAXINTEL feature. When enabled, the system queries AnalyticPhilosophy.net's Zhi knowledge base (authenticated via ZHI_PRIVATE_KEY) and incorporates retrieved passages and citations into the model-building process. When disabled, MAXINTEL operates entirely on its internal pipeline without making any external network calls.

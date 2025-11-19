@@ -256,7 +256,7 @@ COMPLETE ${isTextFiction ? 'STORY' : 'ESSAY'}:`;
         })
       });
       
-      const data = await response.json();
+      const data: any = await response.json();
       rewrittenText = data.choices[0]?.message?.content || '';
     } else if (provider === 'deepseek') {
       const response = await fetch('https://api.deepseek.com/chat/completions', {
@@ -273,7 +273,7 @@ COMPLETE ${isTextFiction ? 'STORY' : 'ESSAY'}:`;
         })
       });
       
-      const data = await response.json();
+      const data: any = await response.json();
       rewrittenText = data.choices[0]?.message?.content || '';
     } else {
       throw new Error(`Unsupported provider: ${provider}`);
