@@ -1321,13 +1321,19 @@ export async function registerRoutes(app: Express): Promise<Express> {
               })
             });
 
-            if (zhiResponse.ok) {
+            if (!zhiResponse.ok) {
+              console.error(`Zhi API error: ${zhiResponse.status} ${zhiResponse.statusText}`);
+              const errorText = await zhiResponse.text();
+              console.error(`Zhi API error details: ${errorText}`);
+            } else {
               const zhiData: any = await zhiResponse.json();
               if (zhiData.success && zhiData.passages && zhiData.passages.length > 0) {
                 console.log(`Retrieved ${zhiData.passages.length} passages from Zhi knowledge base`);
                 externalKnowledge = zhiData.passages
                   .map((p: any, i: number) => `[${i + 1}] ${p.text}\n   Source: ${p.source}`)
                   .join('\n\n');
+              } else {
+                console.log('Zhi API returned no passages or unsuccessful response');
               }
             }
           } catch (error) {
