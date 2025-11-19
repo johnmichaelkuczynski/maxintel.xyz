@@ -2898,25 +2898,613 @@ Be extremely strict - reject any approximations, generalizations, or unqualified
 
       const { analyzeCoherence, rewriteForCoherence } = await import('./services/coherenceMeter');
 
+      const coherenceDefinitions = {
+        "logical-consistency": "Text contains no direct logical contradictions. Statements don't contradict each other.",
+        "logical-cohesiveness": "Claims don't just avoid contradiction—they actively support each other in a directed way. Each statement builds on or follows from previous statements.",
+        "scientific-explanatory": "Explanations align with natural law and known mechanisms. The account could plausibly be true given how the world actually works.",
+        "thematic-psychological": "Mood, imagery, emotional trajectory, and psychological feel maintain consistency and flow naturally. The 'texture' of the writing holds together.",
+        "instructional": "Sends a consistent, actionable message. The reader knows exactly what they are supposed to do. No contradictory directives.",
+        "motivational": "User knows how they are supposed to feel. Emotional direction is clear and maintained throughout. Inspires consistent psychological state.",
+        "auto-detect": "System analyzes the text and determines which type(s) of coherence it's attempting to achieve."
+      };
+
       if (mode === "analyze") {
-        const result = await analyzeCoherence(text);
+        systemPrompt = `You are a coherence analyzer. You evaluate texts for specific types of coherence failures and provide detailed diagnostic reports with numerical scores.`;
+
+        if (coherenceType === "logical-consistency") {
+          userPrompt = `COHERENCE TYPE: Logical Consistency (Non-Contradiction)
+
+DEFINITION: ${coherenceDefinitions["logical-consistency"]}
+
+TEXT TO ANALYZE:
+${text}
+
+Provide a comprehensive analysis in this exact format:
+
+COHERENCE TYPE ANALYZED: Logical Consistency
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+
+[Provide specific analysis identifying any direct contradictions, incompatible claims, or mutually exclusive statements. Include line/sentence references where applicable.]
+
+KEY ISSUES:
+• [List specific contradictions found, if any]
+• [Be specific with examples from the text]
+
+IMPACT ASSESSMENT:
+[Explain how these issues (or lack thereof) affect the text's logical coherence and reader comprehension.]
+
+Scoring Guide:
+- 8-10: PASS - No contradictions, logically consistent
+- 5-7: WEAK - Minor contradictions or ambiguities
+- 1-4: FAIL - Major contradictions that undermine the text`;
+
+        } else if (coherenceType === "logical-cohesiveness") {
+          userPrompt = `COHERENCE TYPE: Logical Cohesiveness (Argumentative Structure)
+
+DEFINITION: ${coherenceDefinitions["logical-cohesiveness"]}
+
+TEXT TO ANALYZE:
+${text}
+
+Provide a comprehensive analysis in this exact format:
+
+COHERENCE TYPE ANALYZED: Logical Cohesiveness
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+
+ARGUMENT STRUCTURE:
+[Map out the logical structure: premises, conclusions, support relationships]
+
+LOGICAL FLOW:
+[Assess whether claims build on each other, whether evidence supports conclusions, whether intermediate steps are provided]
+
+KEY ISSUES:
+• [List gaps in reasoning, unsupported conclusions, non-sequiturs, orphaned claims]
+• [Be specific with examples from the text]
+
+IMPACT ASSESSMENT:
+[Explain how well the argument hangs together and whether the logical structure is valid]
+
+Scoring Guide:
+- 8-10: PASS - Well-structured argument with clear support
+- 5-7: WEAK - Some logical connections but gaps present
+- 1-4: FAIL - Claims don't support each other, major gaps`;
+
+        } else if (coherenceType === "scientific-explanatory") {
+          userPrompt = `COHERENCE TYPE: Scientific/Explanatory Coherence
+
+DEFINITION: ${coherenceDefinitions["scientific-explanatory"]}
+
+TEXT TO ANALYZE:
+${text}
+
+Provide a comprehensive analysis in this exact format:
+
+COHERENCE TYPE ANALYZED: Scientific/Explanatory
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+
+VIOLATIONS OF PHYSICAL LAWS:
+[List any claims that violate known scientific principles]
+
+IMPLAUSIBLE MECHANISMS:
+[Identify explanations that couldn't work given how the world actually operates]
+
+EXPLANATORY GAPS:
+[Note missing causal steps or unjustified leaps]
+
+KEY ISSUES:
+• [Specific violations or problems with scientific coherence]
+• [Examples from the text]
+
+IMPACT ASSESSMENT:
+[Explain whether this explanation could plausibly be true given known science]
+
+Scoring Guide:
+- 8-10: PASS - Aligns with natural law, plausible mechanisms
+- 5-7: WEAK - Minor scientific inaccuracies or oversimplifications
+- 1-4: FAIL - Violates physical laws, implausible explanations`;
+
+        } else if (coherenceType === "thematic-psychological") {
+          userPrompt = `COHERENCE TYPE: Thematic/Psychological Cohesiveness
+
+DEFINITION: ${coherenceDefinitions["thematic-psychological"]}
+
+TEXT TO ANALYZE:
+${text}
+
+Provide a comprehensive analysis in this exact format:
+
+COHERENCE TYPE ANALYZED: Thematic/Psychological
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+
+EMOTIONAL TRAJECTORY:
+[Track the emotional progression through the text]
+
+IMAGERY AND MOOD:
+[Assess whether imagery supports the emotional state]
+
+PSYCHOLOGICAL PLAUSIBILITY:
+[Evaluate whether the sequence of thoughts/feelings rings true]
+
+KEY ISSUES:
+• [Emotional whiplash, jarring transitions, mood-imagery mismatches]
+• [Specific examples from the text]
+
+IMPACT ASSESSMENT:
+[Explain whether the text maintains psychological coherence and believable emotional flow]
+
+Scoring Guide:
+- 8-10: PASS - Consistent emotional tone, psychologically believable
+- 5-7: WEAK - Some emotional inconsistencies or jarring shifts
+- 1-4: FAIL - Emotional whiplash, implausible progression`;
+
+        } else if (coherenceType === "instructional") {
+          userPrompt = `COHERENCE TYPE: Instructional Coherence
+
+DEFINITION: ${coherenceDefinitions["instructional"]}
+
+TEXT TO ANALYZE:
+${text}
+
+Provide a comprehensive analysis in this exact format:
+
+COHERENCE TYPE ANALYZED: Instructional
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+
+DIRECTIVE INVENTORY:
+[List all actionable instructions given]
+
+CONFLICTING DIRECTIVES:
+[Identify any contradictory instructions or unclear priorities]
+
+ACTION CLARITY:
+[Assess whether reader knows exactly what to do]
+
+KEY ISSUES:
+• [Contradictory instructions, ambiguous priorities, unclear action items]
+• [Specific examples from the text]
+
+IMPACT ASSESSMENT:
+[Explain whether the reader can extract a clear, consistent action plan]
+
+Scoring Guide:
+- 8-10: PASS - Clear, consistent directives with unified strategy
+- 5-7: WEAK - Some contradictions or unclear priorities
+- 1-4: FAIL - Contradictory instructions that confuse the reader`;
+
+        } else if (coherenceType === "motivational") {
+          userPrompt = `COHERENCE TYPE: Motivational Coherence
+
+DEFINITION: ${coherenceDefinitions["motivational"]}
+
+TEXT TO ANALYZE:
+${text}
+
+Provide a comprehensive analysis in this exact format:
+
+COHERENCE TYPE ANALYZED: Motivational
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+
+EMOTIONAL DIRECTION:
+[Track whether the text maintains consistent emotional energy]
+
+EMPOWERMENT VS DEFLATION:
+[Identify inspiration immediately undercut by caution, or defeatist language mixed with empowerment]
+
+TONY ROBBINS TEST:
+[Would Tony Robbins say this? Does it pump you up consistently or confuse your emotional state?]
+
+KEY ISSUES:
+• [Inspiration undercut by caution, mixed messages, confusing emotional direction]
+• [Specific examples from the text]
+
+IMPACT ASSESSMENT:
+[Explain the net motivational effect and whether reader has clear emotional direction]
+
+Scoring Guide:
+- 8-10: PASS - Sustained empowerment, clear emotional direction
+- 5-7: WEAK - Some mixed messages but generally motivating
+- 1-4: FAIL - Contradictory emotional direction, demotivating`;
+
+        } else if (coherenceType === "mathematical") {
+          userPrompt = `COHERENCE TYPE: Mathematical (Proof Validity)
+
+DEFINITION: Mathematical proofs require perfect logical coherence—every step must follow validly from previous steps or established axioms/theorems.
+
+PROOF ATTEMPT TO ANALYZE:
+${text}
+
+Your task is to check the logical validity of this mathematical proof with complete rigor.
+
+Check for:
+1. **Logical Validity of Steps**: Does each step follow from previous steps? Are all inferences valid?
+2. **Completeness**: Are there gaps in the argument? Are intermediate steps missing?
+3. **Rigor**: Are quantifiers used correctly? Are domain/range restrictions respected?
+4. **Correctness of Invoked Results**: Are cited theorems stated correctly and applicable?
+5. **Overall Provability**: Is the claimed theorem actually true?
+
+Provide a comprehensive analysis in this exact format:
+
+MATHEMATICAL COHERENCE ANALYSIS
+
+Proof Status: [✓ VALID / ⚠ FLAWED BUT REPAIRABLE / ✗ THEOREM IS FALSE]
+Overall Score: [X]/10
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DETAILED ANALYSIS:
+
+[Identify each error, gap, or invalid step with:]
+ERROR N: [Brief description]
+Location: [Where in proof]
+Issue: [Detailed explanation of the problem]
+Severity: [CRITICAL / MODERATE / MINOR]
+
+[If theorem is false, provide:]
+Counterexample: [Specific example showing theorem fails]
+
+[Then provide overall verdict and explanation]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Scoring Guide:
+- 8-10: VALID - Proof is rigorous and correct
+- 4-7: FLAWED BUT REPAIRABLE - Theorem true but proof has gaps/errors
+- 1-3: THEOREM IS FALSE - Cannot be proven because it's incorrect`;
+
+        } else if (coherenceType === "philosophical") {
+          userPrompt = `COHERENCE TYPE: Philosophical (Conceptual Rigor)
+
+DEFINITION: Philosophical Coherence evaluates whether arguments are conceptually sound, internally consistent, and properly address relevant objections. Unlike mathematical proofs (formal rigor) or logical structure checks, philosophical coherence assesses whether arguments succeed *as philosophy*—engaging with the right concepts, avoiding equivocation, handling counterexamples, and maintaining consistent positions across cases.
+
+PHILOSOPHICAL ARGUMENT TO ANALYZE:
+${text}
+
+Your task is to evaluate this argument for philosophical coherence with complete rigor.
+
+Check for:
+1. **Conceptual Consistency**: Are key terms used consistently? Is there equivocation (same word, different meanings)?
+2. **Position Coherence**: Do commitments in different areas conflict? Are stated principles compatible with applied judgments?
+3. **Counterexample Vulnerability**: Are there obvious objections not addressed? Does the principle generate absurd results in edge cases?
+4. **Principle Consistency**: If you accept X in case A, must you accept X in relevantly similar case B? Are distinctions principled or ad hoc?
+5. **Dialectical Fairness**: Are opposing views represented accurately? Are steel-man versions addressed, or just straw men?
+6. **Hidden Assumptions**: What unstated premises does the argument require? Are these assumptions defensible?
+
+Provide a comprehensive analysis in this exact format:
+
+PHILOSOPHICAL COHERENCE ANALYSIS
+
+Position Status: [✓ COHERENT / ⚠ CONCEPTUAL EQUIVOCATION / ⚠ IGNORES STANDARD OBJECTIONS / ⚠ INCONSISTENT PRINCIPLE APPLICATION / ✗ INTERNALLY CONTRADICTORY]
+Overall Score: [X]/10
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DETAILED ANALYSIS:
+
+[For each philosophical problem found, provide:]
+ERROR N: [Type of problem - Equivocation, Unaddressed Counterexample, Ad Hoc Distinction, etc.]
+Location: [Where in argument]
+Severity: [CRITICAL / MODERATE / MINOR]
+
+Issue: [Detailed explanation of the philosophical problem]
+
+[If there are unaddressed counterexamples, list them:]
+UNADDRESSED COUNTEREXAMPLE N: [Name of counterexample]
+[Explain how it challenges the position]
+
+[If there are hidden assumptions:]
+HIDDEN ASSUMPTION: [State the assumption]
+[Explain why it's problematic or needs defense]
+
+[Then provide overall impact assessment]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Scoring Guide:
+- 8-10: COHERENT - Philosophically sound, addresses objections, consistent principles
+- 5-7: REPAIRABLE - Core position defensible but has coherence issues (equivocation, unaddressed objections, etc.)
+- 1-4: UNTENABLE - Position generates contradictions or absurdities that can't be fixed`;
+
+        } else if (coherenceType === "auto-detect") {
+          userPrompt = `COHERENCE TYPE: Auto-Detect
+
+TEXT TO ANALYZE:
+${text}
+
+Your task is to:
+1. Analyze this text and determine which type(s) of coherence it is attempting to achieve
+2. Then evaluate it for that coherence type
+
+Consider these indicators:
+- Discourse markers (therefore, however, because = logical)
+- Scientific terminology = explanatory coherence
+- Imperative verbs (do this, avoid that = instructional)
+- Emotional language (you can, unstoppable = motivational)
+- Narrative/sensory details (imagery, mood = thematic)
+
+Provide analysis in this exact format:
+
+COHERENCE TYPE DETECTED: [Type Name]
+CONFIDENCE LEVEL: [High / Medium / Low]
+REASONING: [Explain why you chose this type]
+
+Then proceed with full coherence analysis for the detected type:
+
+OVERALL SCORE: [X]/10
+ASSESSMENT: [PASS / WEAK / FAIL]
+
+DETAILED REPORT:
+[Provide full analysis as you would for the detected type]`;
+        }
+
+      } else if (mode === "rewrite") {
+        // Set system prompt based on aggressiveness level
+        if (aggressiveness === "conservative") {
+          systemPrompt = `You are a coherence editor. Make MINIMAL changes to fix coherence issues while preserving the original structure, wording, and style as much as possible. Only fix what is absolutely necessary.`;
+        } else if (aggressiveness === "moderate") {
+          systemPrompt = `You are a coherence improver. Fix major coherence issues by adding missing arguments, clarifying key points, and addressing obvious problems. You may add explanatory context and restructure where needed, but try to preserve the overall structure and voice of the original text.`;
+        } else { // aggressive
+          systemPrompt = `You are a coherence maximizer. Your SOLE OBJECTIVE is to achieve 9-10/10 coherence. You may expand the text significantly, completely restructure arguments, add extensive explanatory context, or rewrite from scratch if needed. PRIORITIZE MAXIMUM COHERENCE OVER ALL OTHER CONCERNS INCLUDING LENGTH.`;
+        }
+
+        if (coherenceType === "logical-consistency") {
+          const lengthGuidance = aggressiveness === "conservative" 
+            ? "should be approximately the same length as the original"
+            : aggressiveness === "moderate"
+            ? "may be moderately longer to add necessary context and clarifications"
+            : "may expand significantly (2-3x longer or more) if needed to achieve 9-10/10 coherence";
+
+          const taskInstructions = aggressiveness === "conservative"
+            ? `1. Fix only the most critical contradictions
+2. Make minimal structural changes
+3. Preserve original wording wherever possible`
+            : aggressiveness === "moderate"
+            ? `1. Eliminate all major contradictions
+2. Resolve incompatible claims
+3. Add clarifying context where significantly needed
+4. Preserve overall structure but make necessary improvements`
+            : `1. Eliminate ALL direct contradictions completely
+2. Resolve incompatible claims aggressively
+3. Add extensive clarifying context
+4. Expand significantly to eliminate any ambiguity
+5. Restructure completely if that achieves better coherence`;
+
+          userPrompt = `COHERENCE TYPE: Logical Consistency (Non-Contradiction)
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+${taskInstructions}
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers, labels, explanations, or descriptions. No "REWRITTEN VERSION:", no "CHANGES MADE:", no commentary. Just the pure rewritten text.
+
+The rewritten text ${lengthGuidance}.`;
+
+        } else if (coherenceType === "logical-cohesiveness") {
+          const lengthGuidance = aggressiveness === "conservative" 
+            ? "should be approximately the same length as the original"
+            : aggressiveness === "moderate"
+            ? "may be moderately longer to add necessary bridging arguments"
+            : "may expand significantly (2-3x longer or more) if needed to achieve 9-10/10 coherence";
+
+          const taskInstructions = aggressiveness === "conservative"
+            ? `1. Fix only the most critical structural gaps
+2. Add minimal bridging where absolutely necessary
+3. Preserve original argumentation style`
+            : aggressiveness === "moderate"
+            ? `1. Ensure claims actively support each other
+2. Add missing intermediate steps where needed
+3. Remove orphaned claims or connect them properly
+4. Strengthen major premise-conclusion relationships`
+            : `1. Ensure ALL claims actively support each other
+2. Add ALL missing intermediate steps
+3. Remove orphaned claims or connect them comprehensively
+4. Strengthen ALL premise-conclusion relationships
+5. Add extensive bridging arguments for maximum cohesiveness`;
+
+          userPrompt = `COHERENCE TYPE: Logical Cohesiveness (Argumentative Structure)
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+${taskInstructions}
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers, labels, explanations, or descriptions. No "REWRITTEN VERSION:", no "CHANGES MADE:", no commentary. Just the pure rewritten text.
+
+The rewritten text ${lengthGuidance}.`;
+
+        } else if (coherenceType === "scientific-explanatory") {
+          userPrompt = `COHERENCE TYPE: Scientific/Explanatory Coherence
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+1. Maintain the core content and message
+2. Correct violations of physical laws
+3. Replace implausible mechanisms with scientifically accurate ones
+4. Add missing causal steps
+5. Ensure explanations align with how the world actually works
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers, labels, explanations, or descriptions. No "REWRITTEN VERSION:", no "CHANGES MADE:", no commentary. Just the pure rewritten text.`;
+
+        } else if (coherenceType === "thematic-psychological") {
+          userPrompt = `COHERENCE TYPE: Thematic/Psychological Cohesiveness
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+1. Maintain the core content and message
+2. Ensure consistent emotional tone throughout
+3. Make imagery support the mood
+4. Ensure psychological progression is believable
+5. Eliminate emotional whiplash or jarring transitions
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers, labels, explanations, or descriptions. No "REWRITTEN VERSION:", no "CHANGES MADE:", no commentary. Just the pure rewritten text.`;
+
+        } else if (coherenceType === "instructional") {
+          userPrompt = `COHERENCE TYPE: Instructional Coherence
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+1. Maintain the core content and message
+2. Eliminate contradictory instructions
+3. Establish clear priorities
+4. Ensure all directives support a unified strategy
+5. Make action items unambiguous
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers, labels, explanations, or descriptions. No "REWRITTEN VERSION:", no "CHANGES MADE:", no commentary. Just the pure rewritten text.`;
+
+        } else if (coherenceType === "motivational") {
+          userPrompt = `COHERENCE TYPE: Motivational Coherence
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+1. Maintain the core content and message
+2. Remove ALL deflating language that undercuts inspiration
+3. Ensure consistent emotional direction throughout
+4. Apply the "Tony Robbins Test" - would he say this?
+5. Maintain sustained empowerment without confusion
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers, labels, explanations, or descriptions. No "REWRITTEN VERSION:", no "CHANGES MADE:", no commentary. Just the pure rewritten text.`;
+
+        } else if (coherenceType === "mathematical") {
+          userPrompt = `COHERENCE TYPE: Mathematical (Proof Validity)
+
+PROOF ATTEMPT:
+${text}
+
+Your task is to repair this mathematical proof OR, if the theorem is false, find the nearest provable theorem and provide a valid proof for it.
+
+Analysis Steps:
+1. Check if the claimed theorem is true
+2. Identify all errors, gaps, and invalid steps in the proof
+
+IF THEOREM IS TRUE (Mode A: Repair Proof):
+- Provide a corrected, complete, rigorous proof
+- Fill all gaps and fix all errors
+- Use proper mathematical notation and rigor
+
+IF THEOREM IS FALSE (Mode B: Find Nearest True Theorem):
+- Provide a counterexample first (internally)
+- Find the nearest provable theorem by restricting domain/adding hypotheses, weakening conclusion, or reversing implication
+- Provide a complete valid proof of the corrected theorem
+
+CRITICAL: Output ONLY the corrected/repaired proof or the nearest provable theorem statement followed by its proof. Do not include any headers like "MATHEMATICAL COHERENCE ANALYSIS", "ANALYSIS OF ORIGINAL PROOF", "CHANGES MADE", or commentary. Just output the mathematical content itself.
+
+Use rigorous mathematical notation. Be precise and formal. Every step must be justified.`;
+
+        } else if (coherenceType === "philosophical") {
+          userPrompt = `COHERENCE TYPE: Philosophical (Conceptual Rigor)
+
+ORIGINAL PHILOSOPHICAL ARGUMENT:
+${text}
+
+Your task is to repair this philosophical argument OR, if the core position is philosophically untenable, provide the nearest coherent philosophical position and rewrite the argument accordingly.
+
+Analysis Steps:
+1. Check if the core position is defensible or generates contradictions/absurdities
+2. Identify all philosophical problems: equivocations, unaddressed counterexamples, inconsistent principle application, ad hoc distinctions, hidden assumptions
+
+IF POSITION IS DEFENSIBLE (Mode A: Repair Argument):
+- Fix all conceptual equivocations (use terms consistently)
+- Address obvious counterexamples and objections
+- Make hidden assumptions explicit and defend them
+- Ensure principles apply consistently across relevantly similar cases
+- Engage with opposing views fairly (steel-man, not straw-man)
+- Maintain the core position while fixing coherence issues
+
+IF POSITION IS UNTENABLE (Mode B: Provide Nearest Coherent Position):
+- Identify the nearest coherent philosophical position
+- Provide a complete rewritten argument for the modified position
+
+CRITICAL: Output ONLY the repaired philosophical argument itself. Do not include any headers like "PHILOSOPHICAL COHERENCE ANALYSIS", "ANALYSIS OF ORIGINAL ARGUMENT", "CHANGES MADE", position status, or commentary. Just output the philosophical argument itself.
+
+Use precise philosophical terminology. Be rigorous in your argumentation.`;
+
+        } else if (coherenceType === "auto-detect") {
+          userPrompt = `COHERENCE TYPE: Auto-Detect
+
+ORIGINAL TEXT:
+${text}
+
+Your task:
+1. Determine which type of coherence this text needs most (logical, scientific, thematic, instructional, motivational, mathematical, or philosophical)
+2. Rewrite to maximize that type of coherence
+
+CRITICAL: Output ONLY the rewritten text itself. Do not include any headers like "DETECTED TYPE:", "REASONING:", "REWRITTEN VERSION:", "CHANGES MADE:", or commentary. Just output the pure rewritten text.`;
+        }
+      }
+
+      // Call Anthropic API (Claude 3.7 Sonnet)
+      const Anthropic = (await import('@anthropic-ai/sdk')).default;
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const message = await anthropic.messages.create({
+        model: "claude-3-7-sonnet-20250219",
+        max_tokens: 4096,
+        temperature: 0.7,
+        system: systemPrompt,
+        messages: [
+          {
+            role: "user",
+            content: userPrompt
+          }
+        ]
+      });
+
+      const output = message.content[0].type === 'text' ? message.content[0].text : '';
+
+      if (mode === "analyze") {
+        // Parse the output to extract score and assessment
+        const scoreMatch = output.match(/OVERALL SCORE:\s*(\d+)\/10/i);
+        const assessmentMatch = output.match(/ASSESSMENT:\s*(PASS|WEAK|FAIL)/i);
         
+        const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+        const assessment = assessmentMatch ? assessmentMatch[1].toUpperCase() : null;
+
         res.json({
           success: true,
-          analysis: result.analysis,
-          score: result.score,
-          assessment: result.assessment,
-          subscores: result.subscores
+          analysis: output,
+          score: score,
+          assessment: assessment as "PASS" | "WEAK" | "FAIL" | null
         });
       } else {
-        const result = await rewriteForCoherence(text, aggressiveness as "conservative" | "moderate" | "aggressive");
+        // Parse the output to extract ONLY the rewritten text
+        const rewriteMatch = output.match(/REWRITTEN VERSION.*?:\n\n([\s\S]*?)\n\nCHANGES MADE:/i);
         
+        const rewrite = rewriteMatch ? rewriteMatch[1].trim() : output;
+
         res.json({
           success: true,
-          rewrite: result.rewrittenText,
-          changes: result.changes
+          rewrite: rewrite
         });
       }
+
     } catch (error: any) {
       console.error("Coherence Meter error:", error);
       res.status(500).json({
