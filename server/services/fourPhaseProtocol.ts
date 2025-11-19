@@ -29,11 +29,49 @@ IF YOUR JUDGMENT IS THAT IT IS INSIGHTFUL, CAN YOU STATEMENT THAT INSIGHT IN A S
 HOW WELL DOES IT MAKE ITS CASE?
 IF I WERE TO GIVE A HIGH SCORE TO THIS PASSAGE, WOULD I BE REWARDING IMPOSTOR SCAFFOLDING?
 IF I WERE TO GIVE A HIGH SCORE TO THIS PASSAGE, WOULD I BE REWARDING CONFORMITY TO ACADEMIC/BUREAUCRATIC NORMS?
-IF I WERE TO GIVE A LOW SCORE TO THIS PASSAGE, WOULD I BE PENALIZING ACTUAL INTELLIGENCE OWING TO A LACK OF CONFORMITY TO ACADEMIC/BUREAUCRATIC NORMS?`;
+IF I WERE TO GIVE A LOW SCORE TO THIS PASSAGE, WOULD I BE PENALIZING ACTUAL INTELLIGENCE OWING TO A LACK OF CONFORMITY TO ACADEMIC/BUREAUCRATIC NORMS?
+
+🚨 CRITICAL NEW DIMENSION: GENUINE DEPTH VS. FAUX POSTURING 🚨
+IS THIS GENUINE INTELLIGENCE OR FAUX-INTELLECTUAL PLACEHOLDER CONTENT?
+- HIERARCHICAL LOGIC: Do ideas actually derive logically from each other? Or is the text just SEQUENTIAL/CHRONOLOGICAL listing ("First... Second... Third...") without logical dependencies?
+- TERMS WITH DETERMINATE PROPERTIES: Are technical terms grounded with clear meanings? Or are they VAGUE PLACEHOLDERS/BUZZWORDS cited but never defined (e.g., "Myth of the Mental", "disjunctivism", "linguistic idealism" mentioned but not explained)?
+- IDEA-DRIVEN VS. AUTHOR-DRIVEN: Does the argument develop based on what entails/confirms what? Or is it AUTHOR-DRIVEN LISTING of "dialogues" and name-dropping without substance?
+- MEANINGFUL CRITIQUE VS. ASSERTION: Are claims substantiated? Or does text just ASSERT things are "problematic/dubious/faulty" without explaining why?
+- SOCIAL POSTURING: Does text turn intellectual questions into "social exchanges" ("dialogues", "accusations", "X says Y says Z")? This is FAUX-INTELLECTUAL.
+
+⚠️ FAUX-INTELLECTUAL MARKERS (MASSIVE SCORE PENALTIES):
+- Sequential listing disguised as argument → SCORE ≤20/100
+- Buzzwords/jargon shuffled without grounding → SCORE ≤20/100
+- Author-driven "dialogue" replacing idea-driven logic → SCORE ≤20/100
+- Vague umbrella claims assuming buzzwords have meaning they lack → SCORE ≤20/100
+- Turning philosophy into social posturing ("X accuses Y of...") → SCORE ≤20/100
+
+✅ GENUINE INTELLIGENCE MARKERS (HIGH SCORES):
+- Hierarchical argumentation where claims build on each other → SCORE 90+
+- Terms with canonical/determinate meanings used precisely → SCORE 90+
+- Idea-driven logic (what entails what) → SCORE 90+
+- Concrete logical relationships and substantive critique → SCORE 90+`;
 
 // PHASE 1: Complete protocol with all questions exactly as specified
 function createPhase1Prompt(text: string, questions: string): string {
-  return `🚨 MANDATORY HIGH-END CALIBRATION OVERRIDE 🚨
+  return `🚨 MANDATORY CALIBRATION EXAMPLES 🚨
+==================================================
+STUDY THESE THREE CALIBRATION EXAMPLES CAREFULLY:
+
+EXAMPLE 1 - GENUINE INTELLIGENCE (SCORE: 98/100):
+"Sense-perceptions do not have to be deciphered if their contents are to be uploaded, the reason being that they are presentations, not representations. Linguistic expressions do have to be deciphered if their contents are to be uploaded, the reason being that they are representations, not presentations. It is viciously regressive to suppose that information-bearing mental entities are categorically in the nature of representations, as opposed to presentations, and it is therefore incoherent to suppose that thought is mediated by expressions or, therefore, by linguistic entities."
+→ SCORE: 98/100 (Hierarchical logic, terms with determinate properties, idea-driven argumentation, precise canonical philosophical terminology)
+
+EXAMPLE 2 - FAUX-INTELLECTUAL PLACEHOLDER (SCORE: 14/100):
+"In this dissertation, I critically examine the philosophy of transcendental empiricism. Transcendental empiricism is, among other things, a philosophy of mental content. It attempts to dissolve an epistemological dilemma of mental content by splitting the difference between two diametrically opposed accounts of content. John McDowell's minimal empiricism and Richard Gaskin's minimalist empiricism are two versions of transcendental empiricism. This dissertation is divided into five parts. First, in the Introduction, I state the Wittgensteinian metaphilosophical orientation. Second, I offer a detailed description of McDowell's minimal empiricism. Third, I critique Gaskin's critique. Fourth, I scrutinize the alleged credentials. I then comment on a recent dialogue between transcendental empiricism and Hubert Dreyfus's phenomenology. The dialogue culminates with Dreyfus's accusation of the 'Myth of the Mental.' I argue that this accusation is correct in which case McDowell's direct realism is problematic. I conclude that minimal empiricism does not dissolve the dilemma. Finally, I argue that Tyler Burge successfully undermines the doctrine of disjunctivism."
+→ SCORE: 14/100 (Sequential author-driven listing, undefined buzzwords shuffled without grounding, social posturing as inquiry, vague "problematic/dubious" assertions without substance)
+
+EXAMPLE 3 - GENUINE TECHNICAL INTELLIGENCE (SCORE: 97/100):
+"We prove there are infinitely many primes using topology on ℤ. Let the basis for the topology consist of all arithmetic progressions {a + bd | b ∈ ℤ} where d > 0. Each basis element is infinite and clopen. Suppose there are only finitely many primes p_1,...,p_r. For each i, the set p_i ℤ is clopen. Let U = ∪ p_i ℤ. Then U is clopen. U contains every integer divisible by at least one prime. Thus U = ℤ \ {-1, 1}. Since U is clopen, {-1, 1} is clopen, hence open. But {-1, 1} is finite while every non-empty open set is infinite—contradiction."
+→ SCORE: 97/100 (Hierarchical proof structure, precise mathematical terms, idea-driven logic where each claim builds on previous)
+
+==================================================
+🚨 MANDATORY HIGH-END CALIBRATION OVERRIDE 🚨
 ==================================================
 BEFORE YOU DO ANYTHING ELSE, READ THIS CALIBRATION RULE:
 
@@ -95,6 +133,15 @@ METAPOINT 7: EXPLICIT HIGH-END CALIBRATION - What deserves 92-97/100:
 - Novel theoretical claims with rigorous support: 92-97 by DEFAULT
 - Sophisticated formal reasoning with clear inferential structure: 92-97 by DEFAULT
 - Coherent, technically precise academic work: 92-97 by DEFAULT
+
+METAPOINT 8: ACCESSIBILITY AND PRIOR KNOWLEDGE:
+🚨 CRITICAL: Assuming prior knowledge BOOSTS intelligence score, NOT lowers it! 🚨
+- Texts written for expert audiences that assume technical knowledge demonstrate HIGHER intelligence
+- Do NOT penalize for "inaccessibility" or "assuming prior knowledge"
+- Using canonical technical terms precisely (presentations vs representations, disjunctivism, regress arguments) is a STRENGTH
+- Only penalize if undefined terms are PLACEHOLDERS with no determinate meaning (faux-intellectual buzzwords)
+- Expert-level discourse assuming shared vocabulary = HIGH SCORE
+- Simplified discourse explaining basic concepts = appropriate for audience, but not extra points for accessibility
 
 CRITICAL: Downgrading sophisticated academic/philosophical work below 90/100 requires identifying CATASTROPHIC reasoning failures (major logical contradictions, completely incoherent arguments, fundamental conceptual confusions). Do NOT downgrade for minor quibbles, stylistic preferences, or "it could be more X." If the work shows genuine philosophical sophistication and technical rigor, it MUST score 92+.
 
