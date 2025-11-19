@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Sparkles, Loader2, Copy, Check } from 'lucide-react';
 import { DocumentAnalysis } from '@/lib/types';
 import CopyButton from '@/components/CopyButton';
@@ -32,6 +33,7 @@ const IntelligentRewriteButton: React.FC<IntelligentRewriteButtonProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [customInstructions, setCustomInstructions] = useState('');
+  const [useExternalKnowledge, setUseExternalKnowledge] = useState(false);
   const [rewriteResult, setRewriteResult] = useState<{
     rewrittenText: string;
     newAnalysis: DocumentAnalysis;
@@ -52,7 +54,8 @@ const IntelligentRewriteButton: React.FC<IntelligentRewriteButtonProps> = ({
         body: JSON.stringify({
           originalText: originalText,
           customInstructions: customInstructions.trim() || undefined,
-          provider: provider
+          provider: provider,
+          useExternalKnowledge: useExternalKnowledge
         }),
       });
 
@@ -101,6 +104,7 @@ const IntelligentRewriteButton: React.FC<IntelligentRewriteButtonProps> = ({
     setIsOpen(false);
     setRewriteResult(null);
     setCustomInstructions('');
+    setUseExternalKnowledge(false);
   };
 
   return (
@@ -128,6 +132,25 @@ const IntelligentRewriteButton: React.FC<IntelligentRewriteButtonProps> = ({
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* External Knowledge Toggle */}
+            <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex-1">
+                <Label htmlFor="external-knowledge" className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Use External Knowledge (AnalyticPhilosophy.net)
+                </Label>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  When enabled, MAXINTEL fetches research passages and citations from the Zhi knowledge base
+                </p>
+              </div>
+              <Switch
+                id="external-knowledge"
+                checked={useExternalKnowledge}
+                onCheckedChange={setUseExternalKnowledge}
+                disabled={isLoading}
+                data-testid="toggle-external-knowledge"
+              />
+            </div>
+
             {/* Custom Instructions */}
             <div className="space-y-2">
               <Label htmlFor="instructions">Custom Instructions (Optional)</Label>
@@ -212,6 +235,7 @@ const IntelligentRewriteButton: React.FC<IntelligentRewriteButtonProps> = ({
                     onClick={() => {
                       setRewriteResult(null);
                       setCustomInstructions('');
+                      setUseExternalKnowledge(false);
                     }}
                     variant="outline"
                     className="flex-1"
