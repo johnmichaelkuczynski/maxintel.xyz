@@ -22,9 +22,11 @@ The application uses a monorepo structure, separating client and server.
 - **UI/UX**: Utilizes shadcn/ui and TailwindCSS for styling, offering detailed card-based layouts for analysis reports and supporting PDF/text downloads. The platform also supports document upload and output download for various file types.
 
 ## External Dependencies
-- **AI Service Providers**: OpenAI API (GPT-4), Anthropic API (Claude), Perplexity AI, DeepSeek API.
+- **AI Service Providers**: OpenAI API (GPT-4) as ZHI 1, Anthropic API (Claude) as ZHI 2, DeepSeek API as ZHI 3, Grok API (xAI) as ZHI 4, Perplexity AI.
 - **Supporting Services**: Mathpix OCR, AssemblyAI, SendGrid, Google Custom Search, Stripe (for credit purchases), AnalyticPhilosophy.net Zhi API (for external knowledge queries).
 - **Database & Infrastructure**: Neon/PostgreSQL, Drizzle ORM, Replit.
 
 ## Recent Updates
-- **November 19, 2025**: Added "Use External Knowledge" toggle to MAXINTEL feature. When enabled, the system queries AnalyticPhilosophy.net's Zhi knowledge base (authenticated via ZHI_PRIVATE_KEY) and incorporates retrieved passages and citations into the model-building process. When disabled, MAXINTEL operates entirely on its internal pipeline without making any external network calls.
+- **November 19, 2025**: 
+  - Added "Use External Knowledge" toggle to MAXINTEL feature. When enabled, the system queries AnalyticPhilosophy.net's Zhi knowledge base (authenticated via ZHI_PRIVATE_KEY) and incorporates retrieved passages and citations into the model-building process. When disabled, MAXINTEL operates entirely on its internal pipeline without making any external network calls.
+  - Added Grok (xAI) as "ZHI 4" provider. Integrated throughout the platform including intelligence analysis, case assessment, MAXINTEL rewriting, GPT Bypass Humanizer, and all evaluation protocols. Uses grok-beta model via xAI API (https://api.x.ai/v1/chat/completions).

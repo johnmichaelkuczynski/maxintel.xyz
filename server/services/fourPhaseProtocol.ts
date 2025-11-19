@@ -187,7 +187,7 @@ function chunkText(text: string, maxWordsPerChunk: number = 500): string[] {
 
 // Generic LLM caller
 async function callLLMProvider(
-  provider: 'openai' | 'anthropic' | 'perplexity' | 'deepseek',
+  provider: 'openai' | 'anthropic' | 'perplexity' | 'deepseek' | 'grok',
   messages: Array<{role: string, content: string}>
 ): Promise<string> {
   try {
@@ -246,6 +246,22 @@ async function callLLMProvider(
       
       const data = await response.json();
       return data.choices?.[0]?.message?.content || '';
+    } else if (provider === 'grok') {
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: "grok-beta",
+          messages: messages,
+          temperature: 0.1
+        })
+      });
+      
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || '';
     }
     
     return '';
@@ -283,7 +299,7 @@ function extractScore(text: string): number {
 // NORMAL PROTOCOL - Phase 1 only
 export async function executeNormalProtocol(
   text: string,
-  provider: 'openai' | 'anthropic' | 'perplexity' | 'deepseek'
+  provider: 'openai' | 'anthropic' | 'perplexity' | 'deepseek' | 'grok'
 ): Promise<any> {
   console.log(`NORMAL INTELLIGENCE ANALYSIS WITH ${provider.toUpperCase()} - PHASE 1 ONLY`);
   console.log(`EXECUTING PHASE 1 ONLY FOR INTELLIGENCE WITH ${provider.toUpperCase()}`);
@@ -316,7 +332,7 @@ export async function executeNormalProtocol(
 // COMPREHENSIVE PROTOCOL - All 4 phases with chunking for high quality
 export async function executeComprehensiveProtocol(
   text: string,
-  provider: 'openai' | 'anthropic' | 'deepseek' | 'perplexity'
+  provider: 'openai' | 'anthropic' | 'deepseek' | 'perplexity' | 'grok'
 ): Promise<any> {
   console.log(`CHUNKED 4-PHASE INTELLIGENCE EVALUATION: Analyzing ${text.length} characters with protocol`);
   console.log(`EXECUTING CHUNKED 4-PHASE PROTOCOL FOR INTELLIGENCE WITH ${provider.toUpperCase()}`);
@@ -440,7 +456,7 @@ export async function executeComprehensiveProtocol(
 // Unified function for backward compatibility 
 export async function executeFourPhaseProtocol(
   text: string,
-  provider: 'openai' | 'anthropic' | 'perplexity' | 'deepseek',
+  provider: 'openai' | 'anthropic' | 'perplexity' | 'deepseek' | 'grok',
   evaluationType: string = 'intelligence',
   mode: 'normal' | 'comprehensive' = 'comprehensive'
 ): Promise<any> {

@@ -62,6 +62,9 @@ export async function performHumanization({
     } else if (actualProvider === 'perplexity') {
       const result = await callPerplexity(prompt);
       ({ rewrittenText, styleAnalysis } = parseHumanizerResponse(result));
+    } else if (actualProvider === 'grok') {
+      const result = await callGrok(prompt);
+      ({ rewrittenText, styleAnalysis } = parseHumanizerResponse(result));
     } else {
       throw new Error(`Unsupported provider: ${actualProvider}`);
     }
@@ -243,6 +246,30 @@ async function callPerplexity(prompt: string): Promise<string> {
 
   if (!response.ok) {
     throw new Error(`Perplexity API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// Grok API call
+async function callGrok(prompt: string): Promise<string> {
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'grok-beta',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 4000,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Grok API error: ${response.statusText}`);
   }
 
   const data = await response.json();
