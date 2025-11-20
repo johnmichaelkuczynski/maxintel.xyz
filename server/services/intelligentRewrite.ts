@@ -15,10 +15,11 @@ interface ZhiQueryResponse {
 
 async function queryZhiKnowledgeBase(text: string): Promise<string | null> {
   const { queryZhiKnowledgeBase: queryZhi } = await import('./zhiApi');
-  const passages = await queryZhi(text, 5);
+  const zhiResult = await queryZhi(text, 5);
   
-  if (passages) {
-    return `\n\nEXTERNAL KNOWLEDGE FROM ZHI DATABASE:\n${passages}\n`;
+  if (zhiResult) {
+    const label = zhiResult.type === 'quotes' ? 'VERBATIM QUOTES' : 'EXCERPTS/SUMMARIES';
+    return `\n\nEXTERNAL KNOWLEDGE FROM ZHI DATABASE (${label}):\n${zhiResult.content}\n`;
   }
   
   return null;

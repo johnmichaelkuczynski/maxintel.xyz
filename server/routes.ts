@@ -1303,23 +1303,38 @@ export async function registerRoutes(app: Express): Promise<Express> {
 
       // Query Zhi database if enabled
       let externalKnowledge = null;
+      let zhiDataType = 'none';
       if (useExternalKnowledge) {
         const { queryZhiKnowledgeBase } = await import('./services/zhiApi');
-        externalKnowledge = await queryZhiKnowledgeBase(message, 5);
+        const zhiResult = await queryZhiKnowledgeBase(message, 5);
+        if (zhiResult) {
+          externalKnowledge = zhiResult.content;
+          zhiDataType = zhiResult.type; // 'quotes' or 'excerpts'
+        }
       }
 
       // Build system message with context
       let systemMessage = "You are an intelligent AI assistant with expertise in philosophy, cognitive science, and academic writing. Provide thoughtful, accurate, and well-sourced responses.";
       
       if (externalKnowledge) {
-        systemMessage += `\n\nIMPORTANT - EXTERNAL KNOWLEDGE FROM ZHI DATABASE:
+        if (zhiDataType === 'quotes') {
+          systemMessage += `\n\nEXTERNAL KNOWLEDGE - VERBATIM QUOTES FROM ZHI DATABASE:
+The following are ACTUAL VERBATIM QUOTES from John-Michael Kuczynski's published works.
+You may present these as direct quotations with proper attribution.
+Use them to provide specific, cited evidence when responding to the user's question.
+
+QUOTES:
+${externalKnowledge}`;
+        } else {
+          systemMessage += `\n\nEXTERNAL KNOWLEDGE - SUMMARIES FROM ZHI DATABASE:
 The following are AI-GENERATED EXCERPTS/SUMMARIES from John-Michael Kuczynski's works, NOT verbatim quotes.
 DO NOT put these in quotation marks or present them as direct quotes.
-Instead, use them as context to inform your response, but clearly state "According to Kuczynski's work on [topic]..." or similar phrasing.
-If the user asks for quotes, explain that only summaries are currently available from the database, not verbatim quotations.
+Instead, use them as context to inform your response, stating "According to Kuczynski's work on [topic]..." or similar phrasing.
+If the user asks for quotes, explain that only summaries are currently available from the database.
 
 EXCERPTS:
 ${externalKnowledge}`;
+        }
       }
       
       if (currentDocument) {

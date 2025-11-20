@@ -35,7 +35,7 @@ export async function queryZhiKnowledgeBase(
   queryText: string,
   maxPassages: number = 5,
   author?: string
-): Promise<string | null> {
+): Promise<{ content: string; type: 'quotes' | 'excerpts' } | null> {
   const zhiPrivateKey = process.env.ZHI_PRIVATE_KEY;
   
   if (!zhiPrivateKey) {
@@ -76,7 +76,7 @@ export async function queryZhiKnowledgeBase(
     
     // Prioritize actual quotes over excerpts
     if (data.quotes && data.quotes.length > 0) {
-      console.log(`✓ Retrieved ${data.quotes.length} quotes from Zhi knowledge base`);
+      console.log(`✓ Retrieved ${data.quotes.length} VERBATIM QUOTES from Zhi knowledge base`);
       
       const formattedQuotes = data.quotes
         .map((quote, i) => 
@@ -84,7 +84,10 @@ export async function queryZhiKnowledgeBase(
         )
         .join('\n\n');
       
-      return formattedQuotes;
+      return {
+        content: formattedQuotes,
+        type: 'quotes'
+      };
     }
     
     // Fall back to excerpts if no quotes available
@@ -93,11 +96,14 @@ export async function queryZhiKnowledgeBase(
       
       const formattedExcerpts = data.results
         .map((result, i) => 
-          `[${i + 1}] ${result.excerpt}\n   — ${result.citation.author}, ${result.citation.work} (excerpt)`
+          `[${i + 1}] ${result.excerpt}\n   — ${result.citation.author}, ${result.citation.work}`
         )
         .join('\n\n');
       
-      return formattedExcerpts;
+      return {
+        content: formattedExcerpts,
+        type: 'excerpts'
+      };
     }
     
     console.log('Zhi API returned no quotes or results');
