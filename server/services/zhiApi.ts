@@ -44,7 +44,17 @@ export async function queryZhiKnowledgeBase(
   }
 
   try {
-    console.log('Querying AnalyticPhilosophy.net Zhi knowledge base...');
+    const requestBody = {
+      query: queryText,
+      author: author || 'John-Michael Kuczynski',
+      limit: maxPassages
+    };
+    
+    console.log('🔵 MAXINTEL → AnalyticPhilosophy.net Zhi API');
+    console.log('   URL: https://analyticphilosophy.net/zhi/query');
+    console.log('   Query:', requestBody.query);
+    console.log('   Author filter:', requestBody.author);
+    console.log('   Limit:', requestBody.limit);
     
     const response = await fetch('https://analyticphilosophy.net/zhi/query', {
       method: 'POST',
@@ -52,11 +62,7 @@ export async function queryZhiKnowledgeBase(
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${zhiPrivateKey}`
       },
-      body: JSON.stringify({
-        query: queryText,
-        author: author || 'John-Michael Kuczynski',
-        limit: maxPassages
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
