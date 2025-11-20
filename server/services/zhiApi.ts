@@ -47,7 +47,8 @@ export async function queryZhiKnowledgeBase(
     const requestBody = {
       query: queryText,
       author: author || 'John-Michael Kuczynski',
-      limit: maxPassages
+      limit: maxPassages,
+      includeQuotes: true
     };
     
     console.log('🔵 MAXINTEL → AnalyticPhilosophy.net Zhi API');
@@ -55,6 +56,7 @@ export async function queryZhiKnowledgeBase(
     console.log('   Query:', requestBody.query);
     console.log('   Author filter:', requestBody.author);
     console.log('   Limit:', requestBody.limit);
+    console.log('   Include Quotes:', requestBody.includeQuotes);
     
     const response = await fetch('https://analyticphilosophy.net/zhi/query', {
       method: 'POST',
