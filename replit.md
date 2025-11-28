@@ -62,3 +62,18 @@ The application uses a monorepo structure, separating client and server.
     - ZHI 4 = Perplexity
     - ZHI 5 = Grok (xAI)
   - Updated all provider mappings across: `server/routes.ts`, `server/services/intelligentRewrite.ts`, `server/services/gptBypassHumanizer.ts`, `server/services/humanizer.ts`, `client/src/components/ProviderSelector.tsx`, `client/src/components/ChatDialog.tsx`, `client/src/pages/HomePage.tsx`.
+
+- **November 28, 2025**:
+  - **MAJOR: Mathematical Model Function Complete Overhaul**: Replaced the shallow "Mickey Mouse formalization" prompt with a rigorous first-order model theory approach. The new system now:
+    1. **SIGNATURE**: Extracts explicit domain description, constants with meanings, predicates with arity and semantics
+    2. **TRANSLATION SCHEMA**: Maps 5-15 English claims from the text to first-order formulas
+    3. **AXIOMS**: Produces 5-15 pure first-order logic axioms using ∀, ∃, →, ∧, ∨, ¬, ↔
+    4. **EXPLICIT MODEL**: Constructs a concrete model M with:
+       - Domain D as an explicit set of elements (drawn from the text)
+       - Constant interpretations mapping each constant to a domain element
+       - Predicate interpretations as explicit extensions (sets of tuples)
+       - Function interpretations (if needed)
+    5. **SATISFACTION CHECK**: Mechanically verifies each axiom TRUE/FALSE in M with brief justification
+    6. **VERDICT**: States whether a satisfying model was found, indicating text consistency
+    7. **LOGICAL PROPERTIES**: Optional analysis of consistency, entailment, minimal domain size, non-isomorphic models
+  - The new prompt enforces: explicit element listing, mechanical verification, elements drawn from text (not invented), substantive axioms over trivialities.

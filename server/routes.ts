@@ -2690,32 +2690,116 @@ ${constraintType === 'true-statements' ? '4. Truth Verification: Verify that the
 CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Relation Graph" not "## 1. Relation Graph". Output clean, natural prose.`;
 
       } else if (mode === "mathmodel") {
-        systemPrompt = `You are an expert at mathematical formalization. You can translate conceptual relationships into precise mathematical notation, equations, operators, spaces, and proofs.
+        systemPrompt = `You are an expert logician and model theorist. Your task is to build ACTUAL first-order models - not vague "formalizations" or prose summaries.
 
-CRITICAL OUTPUT RULES:
-- NO markdown headers (# or ##)
-- NO markdown formatting
-- Use plain text with clear section labels
-- Natural paragraph formatting only`;
+A MODEL consists of:
+1. A DOMAIN D (a non-empty set of objects)
+2. An INTERPRETATION function that assigns:
+   - Each constant symbol to an element of D
+   - Each n-ary predicate symbol to a set of n-tuples from D
+   - Each n-ary function symbol to a function from D^n to D
+
+Your job is to EXTRACT the implicit ontology and logical structure from natural language text, formalize it as axioms, and then BUILD an explicit model that satisfies those axioms.
+
+CRITICAL CONSTRAINTS:
+- NO hand-wavy "formalizations" - every symbol must have an explicit interpretation
+- NO trivial one-element domains unless the text genuinely requires it
+- Domain elements should be drawn from the TEXT, not invented
+- Every predicate must have its extension (the set of tuples that satisfy it) listed explicitly
+- You must VERIFY each axiom against the model
+
+OUTPUT FORMAT: Use plain text with numbered sections. NO markdown headers (no # or ##).`;
         
-        userPrompt = `MATHEMATICAL MODEL MODE
+        userPrompt = `FIRST-ORDER MODEL CONSTRUCTION
 
-Text to formalize:
+================================
+TEXT TO FORMALIZE
+================================
 ${text}
 
-${mathFramework ? `Mathematical framework: ${mathFramework}` : ''}
+${mathFramework ? `Mathematical framework preference: ${mathFramework}` : ''}
 ${rigorLevel ? `Rigor level: ${rigorLevel}` : ''}
 ${customInstructions ? `\nCustom Instructions: ${customInstructions}` : ''}
 
-Task: Formalize this text using mathematical notation. Translate conceptual claims into precise mathematical relationships.
+================================
+YOUR TASK
+================================
+Build a genuine first-order model of this text. Follow these sections EXACTLY:
 
-Provide:
-1. Type Inference: What kind of mathematical structure is this? (optimization, equilibrium, transformation, information flow, etc.)
-2. Formalization: The complete mathematical model with proper notation
-3. Mapping Documentation: Explicit table showing [original term] → [mathematical object]
-4. Implications: What predictions or constraints does this formalization reveal?
+1. SIGNATURE
 
-CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Type Inference" not "## 1. Type Inference". Output clean, natural prose.`;
+Define the formal language:
+- DOMAIN: Describe what objects populate D (1-2 sentences)
+- CONSTANTS: List each constant with its English meaning
+  Format: c1 = "meaning", c2 = "meaning", ...
+- PREDICATES: List each predicate with arity and meaning
+  Format: P(x) = "x has property P", R(x,y) = "x stands in relation R to y"
+- FUNCTIONS (if needed): List each function with meaning
+  Format: f(x) = "the result of applying f to x"
+
+2. TRANSLATION SCHEMA
+
+Map the key English claims from the text to first-order formulas.
+Give 5-15 translations:
+- English: "exact quote or paraphrase from text"
+  Formula: Corresponding first-order formula using your signature
+
+3. AXIOMS
+
+Extract 5-15 core axioms that capture the essential claims. State them as PURE FORMULAS only (no English):
+
+(AX1) ∀x (P(x) → Q(x))
+(AX2) ∃x (R(x,c1) ∧ S(x))
+(AX3) ...
+
+Use standard logical notation: ∀ (for all), ∃ (exists), → (implies), ∧ (and), ∨ (or), ¬ (not), ↔ (iff)
+
+4. EXPLICIT MODEL
+
+Construct ONE concrete model M that satisfies all axioms (if possible):
+
+- DOMAIN D: List elements explicitly
+  D = {a, b, c, d, ...}  (use lowercase letters or descriptive names from the text)
+
+- CONSTANT INTERPRETATION:
+  c1 := element_from_D
+  c2 := element_from_D
+  ...
+
+- PREDICATE INTERPRETATION (give the EXTENSION of each predicate):
+  P := { x ∈ D : x satisfies P } = { a, c }
+  R := { (x,y) ∈ D² : x R y } = { (a,b), (c,d) }
+  ...
+
+- FUNCTION INTERPRETATION (if any):
+  f := { (x, f(x)) : x ∈ D } = { (a,b), (b,c) }
+
+5. SATISFACTION CHECK
+
+For EACH axiom, verify whether it is TRUE or FALSE in M:
+
+(AX1): TRUE in M because [brief mechanical verification]
+(AX2): TRUE in M because [brief verification]
+(AX3): FALSE in M because [explain counterexample]
+...
+
+VERDICT:
+If all axioms satisfied: "MODEL FOUND: M satisfies all axioms. The text is internally consistent."
+If any axiom fails: "NO SATISFYING MODEL FOUND with this domain. Axioms AX3, AX7 fail. The text may be internally inconsistent, or a larger domain is needed."
+
+6. LOGICAL PROPERTIES (Optional but valuable)
+
+Comment on:
+- Is the axiom set consistent? (Does a model exist?)
+- Are there logical dependencies? (Does one axiom entail another?)
+- What is the minimal domain size that could satisfy the axioms?
+- Are there multiple non-isomorphic models?
+
+CRITICAL REMINDERS:
+- Be EXPLICIT: List every element of every extension
+- Be MECHANICAL: The satisfaction check should be a direct calculation
+- Use elements FROM THE TEXT: Don't invent abstract entities
+- Prefer SUBSTANTIVE axioms that capture real content, not trivialities`;
 
       } else if (mode === "autodecide") {
         systemPrompt = `You are an expert at analyzing texts and choosing the optimal validation approach. You can assess structural integrity, terminological clarity, domain specificity, and conceptual coherence to determine whether a text needs reconstruction, isomorphic demonstration, mathematical formalization, or a combination.
