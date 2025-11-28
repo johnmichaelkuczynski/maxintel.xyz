@@ -2714,6 +2714,22 @@ Generated on: ${new Date().toLocaleString()}`;
                   />
                   <CopyButton text={validatorOutput} />
                   <Button
+                    onClick={() => {
+                      setShowValidatorCustomization(true);
+                      toast({
+                        title: "Redo Mode",
+                        description: "Modify your instructions and click Generate to re-run with the same text"
+                      });
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300"
+                    data-testid="button-redo-validator"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-1" />
+                    Redo
+                  </Button>
+                  <Button
                     onClick={handleValidatorClear}
                     variant="outline"
                     size="sm"
