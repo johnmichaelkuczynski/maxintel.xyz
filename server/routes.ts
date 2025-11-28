@@ -2902,78 +2902,148 @@ Provide:
 CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth-Value Analysis" not "## 1. Truth-Value Analysis". Output clean, natural prose.`;
 
       } else if (mode === "math-truth-select") {
-        systemPrompt = `You are an expert at mathematical formalization with explicit control over truth-value assignment. You can translate conceptual relationships into precise mathematical notation AND control whether the formalization is true or false through strategic semantic value assignment to constants.
+        systemPrompt = `You are an expert logician specializing in MODEL THEORY and REAL-WORLD TRUTH VERIFICATION.
 
-${literalTruth ? `LITERAL TRUTH MODE ENABLED:
-When assigning semantic values to mathematical constants, ensure the resulting formalization is LITERALLY true under empirical verification, not just approximately or theoretically true.
+Your task is FUNDAMENTALLY DIFFERENT from abstract formalization:
+- You must find a first-order model where EVERY axiom is 100% TRUE IN REALITY
+- "True" means empirically verifiable, logically necessary, or established fact - NOT "satisfies the axiom in some abstract structure"
+- If the original domain yields false axioms, you MUST find an isomorphic structure in a DIFFERENT DOMAIN where the same logical form yields ALL TRUE statements
 
-MANDATORY REQUIREMENTS FOR LITERAL TRUTH:
-- Assigned values must correspond to real, verifiable entities/phenomena
-- Include explicit domains and ranges for all quantifiers
-- Add necessary preconditions to the formalization
-- Verify truth under real-world conditions, not idealized assumptions
+KEY DISTINCTION:
+- Abstract model: ∀x(P(x) → Q(x)) is "satisfied" if the extension of P is subset of Q in some made-up domain
+- TRUE model: ∀x(P(x) → Q(x)) is TRUE if, when P and Q are grounded in REAL entities, every real P-thing really is a Q-thing
 
-QUANTIFIER WEAKENING RULES:
-- ∀x ∈ X → ∀x ∈ X satisfying conditions C
-- "for all time t" → "for all t in observed range [t₁, t₂]"
-- Absolute equalities (=) → approximate equalities (≈) with error bounds when empirically measured
-- Add conditional constraints: "given that P holds" 
-
-EXAMPLE:
-❌ APPROXIMATE: BoilingPoint(H₂O) = 100°C  
-✅ LITERALLY TRUE: BoilingPoint(H₂O, P=1atm, elevation=sea_level) = 100°C ± 0.5°C
-
-❌ TOO STRONG: ∀x ∈ Traders: Returns(x,t) > Market(t)
-✅ LITERALLY TRUE: ∀x ∈ {Warren Buffett} ∀t ∈ [1965,2023]: Returns(x,t) > S&P500_excluding_dividends(t)` : ''}
+You are searching for TRUTH, not mere satisfiability.
 
 CRITICAL OUTPUT RULES:
 - NO markdown headers (# or ##)
-- NO markdown formatting
-- Use plain text with clear section labels
-- Natural paragraph formatting only`;
+- Use plain text with numbered sections
+- Every claim must be verifiable`;
         
-        const mathTruthDescriptions = {
-          'make-true': 'Assign semantic values to mathematical constants that make the formalization TRUE (useful when the original statement is false)',
-          'keep-true': 'Assign semantic values to mathematical constants that preserve the TRUE nature of the original statement',
-          'make-false': 'Assign semantic values to mathematical constants that make the formalization FALSE (useful for showing counterexamples)'
-        };
+        userPrompt = `TRUTH-GROUNDED MODEL CONSTRUCTION
 
-        userPrompt = `MATHEMATICAL MODEL WITH TRUTH-VALUE SELECTION
-
-Text to formalize:
+================================
+TEXT TO FORMALIZE
+================================
 ${text}
 
-${mathFramework ? `Mathematical framework: ${mathFramework}` : ''}
+${mathFramework ? `Mathematical framework preference: ${mathFramework}` : ''}
 ${rigorLevel ? `Rigor level: ${rigorLevel}` : ''}
-Truth-Value Assignment: ${mathTruthMapping ? mathTruthDescriptions[mathTruthMapping as keyof typeof mathTruthDescriptions] : 'Not specified'}
 ${customInstructions ? `\nCustom Instructions: ${customInstructions}` : ''}
 
-Task: Create a mathematical formalization of this text AND assign specific semantic values to the constants that control the truth value according to: ${mathTruthMapping}.
+================================
+YOUR MISSION
+================================
+Find a first-order model M where EVERY axiom is 100% TRUE IN THE REAL WORLD.
 
-${mathTruthMapping === 'make-true' ? `First determine if the original statement is true or false. If it is FALSE, assign semantic values to the mathematical constants that would make the formalization TRUE. Show how assigning different values transforms a false claim into a true mathematical statement.
+This is NOT about abstract satisfiability. You must ground each constant and predicate in REAL entities such that every axiom states a FACT.
 
-Example: "All traders consistently beat the market" (FALSE)
-→ Formalize as: ∀x ∈ Traders: Returns(x,t) > Market(t) for all t
-→ Assign values: Traders = {Warren Buffett over 1965-2023}, Market = S&P 500 excluding dividends
-→ Result: NOW TRUE because Buffett's returns exceeded the S&P 500 capital gains over this period` : ''}
+Follow these sections EXACTLY:
 
-${mathTruthMapping === 'keep-true' ? `Determine the truth status of the original statement. If TRUE, assign semantic values that preserve this truth in the formalization. Show how proper value assignment maintains truth across the translation to mathematics.` : ''}
+1. SIGNATURE
 
-${mathTruthMapping === 'make-false' ? `First determine if the original statement is true. If TRUE, assign semantic values that would make the formalization FALSE. This reveals how the same mathematical structure can have different truth values depending on interpretation.
+Define the formal language:
+- CONSTANTS: c1, c2, ... with placeholder meanings from text
+- PREDICATES: P(x), R(x,y), ... with placeholder meanings from text
+- DOMAIN DESCRIPTION: What kind of objects are we talking about?
 
-Example: "Water boils at 100°C" (TRUE under standard conditions)
-→ Formalize as: BoilingPoint(H₂O) = 100°C
-→ Assign values: Conditions = {Pressure = 0.5 atm, Elevation = 5000m}
-→ Result: NOW FALSE because water boils at ~83°C at this pressure` : ''}
+2. AXIOM EXTRACTION
 
-Provide:
-1. Truth Analysis: Determine the truth status of the original statement and explain why
-2. Abstract Formalization: The mathematical model with unassigned constants/variables
-3. Semantic Value Assignment: Specific values assigned to each constant to achieve the target truth value
-4. Verification: Proof that the assigned values produce the desired truth value
-5. Alternative Assignments: Show how different value assignments would change the truth value
+Extract 5-15 first-order axioms that capture the core claims:
+(AX1) ∀x (P(x) → Q(x))
+(AX2) ∃x R(x, c1)
+...
 
-CRITICAL: NO markdown headers (no # or ##). Use plain text labels like "1. Truth Analysis" not "## 1. Truth Analysis". Output clean, natural prose.`;
+3. TRUTH AUDIT OF ORIGINAL DOMAIN
+
+For each axiom, determine: Is this TRUE or FALSE when interpreted literally in the text's original domain?
+
+(AX1): [TRUE/FALSE] - Evidence: [why]
+(AX2): [TRUE/FALSE] - Evidence: [why]
+...
+
+ORIGINAL DOMAIN VERDICT: [X of Y axioms are true / Y axioms are false]
+
+4. TRUTH-GROUNDED MODEL
+
+Now find a REAL-WORLD INTERPRETATION where ALL axioms become TRUE:
+
+Option A - If original domain works:
+- Ground each constant in a SPECIFIC real entity
+- Ground each predicate in a VERIFIABLE property/relation
+- Verify each axiom is TRUE with this grounding
+
+Option B - If original domain fails (some axioms false):
+- IDENTIFY which axioms fail and why
+- SEARCH for an isomorphic domain where the same logical structure yields truth
+- The new domain may be from physics, biology, mathematics, history, computing, etc.
+- The key: preserve the LOGICAL FORM but change the SUBJECT MATTER
+
+TRUTH-GROUNDED INTERPRETATION:
+- DOMAIN D: [Real-world category of objects]
+- CONSTANT GROUNDING:
+  c1 := [Specific real entity, e.g., "Warren Buffett", "the electron", "World War II"]
+  c2 := [Specific real entity]
+  ...
+- PREDICATE GROUNDING:
+  P(x) := "[Verifiable property, e.g., 'x is a mammal', 'x has mass > 0']"
+  R(x,y) := "[Verifiable relation, e.g., 'x is ancestor of y', 'x causes y']"
+  ...
+
+5. TRUTH VERIFICATION
+
+For EACH axiom, prove it is TRUE under your grounding:
+
+(AX1): TRUE because [specific evidence/reasoning with the grounded interpretation]
+(AX2): TRUE because [specific evidence/reasoning]
+...
+
+CRITICAL: Every axiom must be verifiable. If you cannot verify an axiom as true, you have not found the right grounding.
+
+6. FINAL VERDICT
+
+STATE CLEARLY:
+- Did you use the original domain or switch domains?
+- If switched: What domain did you switch to and why?
+- ALL AXIOMS TRUE? [YES/NO]
+- If NO: Which axiom(s) could not be made true and why?
+
+7. ISOMORPHISM DEMONSTRATION (if domain was switched)
+
+Show the structural mapping:
+[Original term] → [New domain term]
+[Original relation] → [New domain relation]
+
+Explain: Why does this mapping preserve the logical structure while changing truth values from FALSE to TRUE?
+
+================================
+EXAMPLES OF DOMAIN SWITCHING
+================================
+
+Example 1: Finance → Physics
+- Original (FALSE): "No trader can systematically beat the market over 30 years"
+- Grounding attempt: Traders={all hedge fund managers}, Market={S&P 500 total return}
+- Axiom: ∀x∈Traders ∀t∈[30 years]: Returns(x,t) ≤ Market(t)
+- FAILS: Warren Buffett, Renaissance Technologies disprove this
+
+DOMAIN SWITCH to Physics:
+- New grounding: Objects={heat engines}, Performance={efficiency}
+- Axiom becomes: ∀x∈HeatEngines: Efficiency(x) ≤ CarnotLimit
+- TRUE: Second law of thermodynamics guarantees this
+
+Example 2: Psychology → Biology
+- Original (VAGUE): "All learning requires reinforcement"
+- FAILS in psychology: Some learning is latent/observational
+
+DOMAIN SWITCH to Molecular Biology:
+- New grounding: Learning={synaptic strengthening}, Reinforcement={repeated activation}
+- Axiom: ∀x∈Synapses: Strengthened(x) → RepeatedlyActivated(x)
+- TRUE: Long-term potentiation requires repeated stimulation
+
+================================
+REMEMBER
+================================
+Your goal is not to "satisfy axioms in some model" but to FIND A MODEL WHERE EVERY AXIOM IS A TRUE STATEMENT ABOUT REALITY. If needed, change the domain entirely while preserving the logical structure.`;
 
       } else {
         return res.status(400).json({

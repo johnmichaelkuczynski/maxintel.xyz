@@ -77,3 +77,12 @@ The application uses a monorepo structure, separating client and server.
     6. **VERDICT**: States whether a satisfying model was found, indicating text consistency
     7. **LOGICAL PROPERTIES**: Optional analysis of consistency, entailment, minimal domain size, non-isomorphic models
   - The new prompt enforces: explicit element listing, mechanical verification, elements drawn from text (not invented), substantive axioms over trivialities.
+  - **Math + Truth Function Complete Redesign**: The `math-truth-select` mode now searches for models where axioms are **100% TRUE IN REALITY**, not merely "satisfied in some abstract structure." The new pipeline:
+    1. **SIGNATURE**: Extract constants and predicates from text
+    2. **AXIOM EXTRACTION**: 5-15 first-order axioms capturing core claims
+    3. **TRUTH AUDIT**: Check each axiom TRUE/FALSE in the original domain with evidence
+    4. **TRUTH-GROUNDED MODEL**: If original domain fails, search for an ISOMORPHIC DOMAIN (physics, biology, math, history, etc.) where the same logical structure yields ALL TRUE statements
+    5. **TRUTH VERIFICATION**: Prove each axiom is TRUE under the new grounding with specific evidence
+    6. **FINAL VERDICT**: State whether all axioms are true and explain domain switches
+    7. **ISOMORPHISM DEMONSTRATION**: Show the structural mapping that preserves logic while achieving truth
+  - Key distinction: "TRUE" means empirically verifiable or logically necessary in reality, not "satisfies axioms in made-up domain."
