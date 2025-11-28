@@ -30,13 +30,14 @@ interface ChatDialogProps {
   onSendToValidator?: (text: string) => void;
 }
 
-type LLMProvider = "zhi1" | "zhi2" | "zhi3" | "zhi4";
+type LLMProvider = "zhi1" | "zhi2" | "zhi3" | "zhi4" | "zhi5";
 
 const AI_PROVIDERS = [
   { value: "zhi1", label: "Zhi 1" },
   { value: "zhi2", label: "Zhi 2" },
   { value: "zhi3", label: "Zhi 3" },
-  { value: "zhi4", label: "Zhi 4" }
+  { value: "zhi4", label: "Zhi 4" },
+  { value: "zhi5", label: "Zhi 5" }
 ] as const;
 
 export const ChatDialog: React.FC<ChatDialogProps> = ({

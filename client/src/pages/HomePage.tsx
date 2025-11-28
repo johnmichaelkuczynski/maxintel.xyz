@@ -1007,7 +1007,8 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-      'zhi4': 'grok'
+      'zhi4': 'perplexity',
+      'zhi5': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -1160,7 +1161,8 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-      'zhi4': 'grok'
+      'zhi4': 'perplexity',
+      'zhi5': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -1215,7 +1217,8 @@ DOES THE AUTHOR USE OTHER AUTHORS TO DEVELOP HIS IDEAS OR TO CLOAK HIS OWN LACK 
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-      'zhi4': 'grok'
+      'zhi4': 'perplexity',
+      'zhi5': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -1464,7 +1467,8 @@ Generated on: ${new Date().toLocaleString()}`;
       'zhi1': 'openai',
       'zhi2': 'anthropic', 
       'zhi3': 'deepseek',
-      'zhi4': 'grok'
+      'zhi4': 'perplexity',
+      'zhi5': 'grok'
     };
     const actualApiKey = apiKeyMapping[selectedProvider] || selectedProvider;
     if (selectedProvider !== "all" && !apiStatus[actualApiKey as keyof typeof apiStatus]) {
@@ -3540,6 +3544,7 @@ Generated on: ${new Date().toLocaleString()}`;
                     <SelectItem value="zhi1">ZHI 1</SelectItem>
                     <SelectItem value="zhi3">ZHI 3</SelectItem>
                     <SelectItem value="zhi4">ZHI 4</SelectItem>
+                    <SelectItem value="zhi5">ZHI 5</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

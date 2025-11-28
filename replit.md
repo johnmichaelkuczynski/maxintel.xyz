@@ -22,7 +22,7 @@ The application uses a monorepo structure, separating client and server.
 - **UI/UX**: Utilizes shadcn/ui and TailwindCSS for styling, offering detailed card-based layouts for analysis reports and supporting PDF/text downloads. The platform also supports document upload and output download for various file types.
 
 ## External Dependencies
-- **AI Service Providers**: OpenAI API (GPT-4) as ZHI 1, Anthropic API (Claude) as ZHI 2, DeepSeek API as ZHI 3, Grok API (xAI) as ZHI 4, Perplexity AI.
+- **AI Service Providers**: OpenAI API (GPT-4) as ZHI 1, Anthropic API (Claude) as ZHI 2, DeepSeek API as ZHI 3, Perplexity AI as ZHI 4, Grok API (xAI) as ZHI 5.
 - **Supporting Services**: Mathpix OCR, AssemblyAI, SendGrid, Google Custom Search, Stripe (for credit purchases), AnalyticPhilosophy.net Zhi API (for external knowledge queries).
 - **Database & Infrastructure**: Neon/PostgreSQL, Drizzle ORM, Replit.
 
@@ -55,3 +55,10 @@ The application uses a monorepo structure, separating client and server.
   - **Dynamic Quote/Excerpt Detection**: Updated `zhiApi.ts` to intelligently detect whether the API returns verbatim quotes or summaries, and instructs the LLM accordingly. System prioritizes `quotes[]` array (verbatim text) over `results[]` array (summaries).
   - **Full Integration Confirmed**: Both AI Chat Assistant (with "Zhi Database" toggle) and MAXINTEL (with "Use External Knowledge" toggle) now successfully retrieve and present real Kuczynski quotes with proper citations from works like "The Pianist's Hand", "Essay 11", "Essay 21", etc.
   - **Testing Results**: Confirmed retrieval of 9-15 verbatim quotes per query on topics including AI, consciousness, epistemology, and other philosophical subjects.
+  - **LLM Provider Reorganization**: Added ZHI 5 as Grok (xAI) and moved Perplexity to ZHI 4. Complete provider mapping is now:
+    - ZHI 1 = OpenAI (GPT-4)
+    - ZHI 2 = Anthropic (Claude)
+    - ZHI 3 = DeepSeek
+    - ZHI 4 = Perplexity
+    - ZHI 5 = Grok (xAI)
+  - Updated all provider mappings across: `server/routes.ts`, `server/services/intelligentRewrite.ts`, `server/services/gptBypassHumanizer.ts`, `server/services/humanizer.ts`, `client/src/components/ProviderSelector.tsx`, `client/src/components/ChatDialog.tsx`, `client/src/pages/HomePage.tsx`.
