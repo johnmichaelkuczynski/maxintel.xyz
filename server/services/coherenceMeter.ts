@@ -107,6 +107,135 @@ CALIBRATION EXAMPLES:
   };
 }
 
+export interface MathProofValidityResult {
+  score: number;
+  verdict: "VALID" | "FLAWED" | "INVALID";
+  analysis: string;
+  subscores: {
+    claimTruth: number;
+    inferenceValidity: number;
+    boundaryConditions: number;
+    overallSoundness: number;
+  };
+  flaws: string[];
+  counterexamples: string[];
+}
+
+export async function analyzeMathProofValidity(text: string): Promise<MathProofValidityResult> {
+  const systemPrompt = `You are a rigorous mathematical proof validator. Your task is to verify MATHEMATICAL CORRECTNESS, not just logical flow.
+
+CRITICAL DISTINCTION:
+- Standard coherence checks if steps follow from premises (logical flow)
+- Mathematical validity checks if the MATHEMATICAL CLAIMS ARE TRUE
+
+YOU MUST CHECK:
+1. CLAIM TRUTH: Are the mathematical statements actually true? Test with concrete values.
+2. INFERENCE VALIDITY: Does each step follow mathematically (not just logically) from previous steps?
+3. BOUNDARY CONDITIONS: Do the claims hold at boundary cases? Test edge cases explicitly.
+4. COUNTEREXAMPLES: Actively search for counterexamples that would invalidate claims.
+
+VERIFICATION METHODOLOGY:
+- For inequalities: TEST SPECIFIC VALUES. Don't just accept claims like "p! < 2^p" - compute p! and 2^p for p = 3, 5, 7, 10 and CHECK.
+- For universal claims: Look for counterexamples in the claimed domain.
+- For existence claims: Can you exhibit a witness?
+- For growth rate claims: Compute actual values and compare.
+
+SCORING:
+- CLAIM TRUTH (0-10): Are the mathematical claims empirically/provably true?
+- INFERENCE VALIDITY (0-10): Are inference steps mathematically sound?
+- BOUNDARY CONDITIONS (0-10): Do claims hold at edges of claimed domains?
+- OVERALL SOUNDNESS (0-10): Would this proof be accepted by a mathematician?
+
+A proof with good "logical flow" but FALSE mathematical claims should score LOW.`;
+
+  const userPrompt = `MATHEMATICAL PROOF VALIDITY ANALYSIS
+
+Analyze this proof for MATHEMATICAL CORRECTNESS, not just logical coherence.
+
+PROOF TO VALIDATE:
+${text}
+
+YOUR TASK:
+1. IDENTIFY all mathematical claims (inequalities, growth rates, divisibility claims, etc.)
+2. TEST each claim with SPECIFIC VALUES - show your calculations
+3. IDENTIFY any false claims or unsubstantiated assumptions
+4. CHECK boundary conditions and edge cases
+5. SEARCH for counterexamples
+6. VERIFY each inference step is mathematically (not just logically) valid
+
+OUTPUT FORMAT:
+
+CLAIM TRUTH SCORE: [X]/10
+[List each major claim and whether it's TRUE/FALSE with evidence. COMPUTE specific values.]
+
+INFERENCE VALIDITY SCORE: [X]/10
+[For each inference step, is the mathematical reasoning sound? Point out gaps.]
+
+BOUNDARY CONDITIONS SCORE: [X]/10
+[Test edge cases. What happens at boundaries of claimed domains?]
+
+OVERALL SOUNDNESS SCORE: [X]/10
+[Would a mathematician accept this proof? Why or why not?]
+
+COUNTEREXAMPLES FOUND:
+[List any counterexamples that invalidate claims]
+
+FLAWS IDENTIFIED:
+[List all mathematical errors, false claims, and gaps in the proof]
+
+VERDICT: [VALID if overall ≥ 8 and no fatal flaws / FLAWED if 4-7 or has repairable issues / INVALID if ≤ 3 or has fatal flaws]
+
+DETAILED ANALYSIS:
+[Full mathematical critique with calculations shown]`;
+
+  const message = await anthropic.messages.create({
+    model: "claude-3-7-sonnet-20250219",
+    max_tokens: 6000,
+    temperature: 0.2,
+    system: systemPrompt,
+    messages: [{ role: "user", content: userPrompt }]
+  });
+
+  const output = message.content[0].type === 'text' ? message.content[0].text : '';
+
+  const claimTruthMatch = output.match(/CLAIM TRUTH SCORE:\s*(\d+(?:\.\d+)?)\/10/i);
+  const inferenceMatch = output.match(/INFERENCE VALIDITY SCORE:\s*(\d+(?:\.\d+)?)\/10/i);
+  const boundaryMatch = output.match(/BOUNDARY CONDITIONS SCORE:\s*(\d+(?:\.\d+)?)\/10/i);
+  const soundnessMatch = output.match(/OVERALL SOUNDNESS SCORE:\s*(\d+(?:\.\d+)?)\/10/i);
+  const verdictMatch = output.match(/VERDICT:\s*(VALID|FLAWED|INVALID)/i);
+
+  const claimTruth = claimTruthMatch ? parseFloat(claimTruthMatch[1]) : 5;
+  const inferenceValidity = inferenceMatch ? parseFloat(inferenceMatch[1]) : 5;
+  const boundaryConditions = boundaryMatch ? parseFloat(boundaryMatch[1]) : 5;
+  const overallSoundness = soundnessMatch ? parseFloat(soundnessMatch[1]) : 5;
+
+  const score = (claimTruth + inferenceValidity + boundaryConditions + overallSoundness) / 4;
+  const verdict = (verdictMatch ? verdictMatch[1].toUpperCase() : 
+    score >= 8 ? "VALID" : score >= 4 ? "FLAWED" : "INVALID") as "VALID" | "FLAWED" | "INVALID";
+
+  const flawsSection = output.match(/FLAWS IDENTIFIED:\s*([\s\S]*?)(?=VERDICT:|DETAILED ANALYSIS:|$)/i);
+  const counterexamplesSection = output.match(/COUNTEREXAMPLES FOUND:\s*([\s\S]*?)(?=FLAWS IDENTIFIED:|VERDICT:|DETAILED ANALYSIS:|$)/i);
+
+  const flaws = flawsSection ? 
+    flawsSection[1].split(/\n/).filter(line => line.trim().match(/^[-•\d.]/)).map(line => line.trim()) : [];
+  const counterexamples = counterexamplesSection ?
+    counterexamplesSection[1].split(/\n/).filter(line => line.trim().match(/^[-•\d.]/)).map(line => line.trim()) : [];
+
+  return {
+    score: Math.round(score * 10) / 10,
+    verdict,
+    analysis: output,
+    subscores: {
+      claimTruth,
+      inferenceValidity,
+      boundaryConditions,
+      overallSoundness
+    },
+    flaws,
+    counterexamples
+  };
+}
+
 export async function rewriteForCoherence(
   text: string, 
   aggressiveness: "conservative" | "moderate" | "aggressive" = "moderate"

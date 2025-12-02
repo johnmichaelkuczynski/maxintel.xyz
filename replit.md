@@ -95,3 +95,12 @@ The application uses a monorepo structure, separating client and server.
     - Self-contained: reader unfamiliar with original can understand complete argument
     - Direct presentation of argument, not meta-commentary ("the text says...")
     - Resolves apparent tensions charitably by showing how they cohere
+  - **NEW: Mathematical Proof Validity Mode**: Added dedicated `math-proof-validity` mode to Coherence Meter that verifies MATHEMATICAL CORRECTNESS, not just logical flow. Key differences from standard coherence:
+    - Tests mathematical claims with SPECIFIC VALUES (computes p!, 2^p, etc.)
+    - Actively searches for COUNTEREXAMPLES
+    - Verifies boundary conditions and edge cases
+    - Checks if each inference step is mathematically (not just logically) valid
+    - Returns: Claim Truth Score, Inference Validity Score, Boundary Conditions Score, Overall Soundness Score
+    - Verdict: VALID / FLAWED / INVALID (not just PASS/WEAK/FAIL)
+    - Lists specific flaws and counterexamples found
+    - Example: A flawed proof claiming "p! + 1 < 2^p · p for all p > 2" would now FAIL because testing p=7 shows 5041 > 896

@@ -3238,18 +3238,30 @@ Be extremely strict - reject any approximations, generalizations, or unqualified
         });
       }
 
-      if (mode !== "analyze" && mode !== "rewrite") {
+      if (mode !== "analyze" && mode !== "rewrite" && mode !== "math-proof-validity") {
         return res.status(400).json({
           success: false,
-          message: "Mode must be either 'analyze' or 'rewrite'"
+          message: "Mode must be 'analyze', 'rewrite', or 'math-proof-validity'"
         });
       }
 
       console.log(`Coherence Meter - Mode: ${mode}, Aggressiveness: ${aggressiveness}, Text length: ${text.length}`);
 
-      const { analyzeCoherence, rewriteForCoherence } = await import('./services/coherenceMeter');
+      const { analyzeCoherence, rewriteForCoherence, analyzeMathProofValidity } = await import('./services/coherenceMeter');
 
-      if (mode === "analyze") {
+      if (mode === "math-proof-validity") {
+        const result = await analyzeMathProofValidity(text);
+        
+        res.json({
+          success: true,
+          analysis: result.analysis,
+          score: result.score,
+          verdict: result.verdict,
+          subscores: result.subscores,
+          flaws: result.flaws,
+          counterexamples: result.counterexamples
+        });
+      } else if (mode === "analyze") {
         const result = await analyzeCoherence(text);
         
         res.json({
