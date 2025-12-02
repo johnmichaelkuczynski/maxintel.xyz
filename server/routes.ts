@@ -2587,39 +2587,64 @@ Structural understanding is always understanding of relationships. Observational
       if (mode === "reconstruction") {
         // DRAMATICALLY different prompts based on fidelity level
         if (fidelityLevel === 'conservative') {
-          systemPrompt = `You are an expert at making MINIMAL fixes to text while preserving the original as much as possible.
+          systemPrompt = `You are an expert philosophical interpreter and expositor. Your task is to produce a SELF-CONTAINED, COHERENT interpretation of a text - a unified explanation of what the author is arguing, written as flowing prose.
 
-CONSERVATIVE MODE RULES:
-1. Change ONLY what is obviously false or broken
-2. Keep original wording, phrasing, and structure whenever possible
-3. Fix only the most glaring errors
-4. Do NOT add examples unless absolutely necessary
-5. Preserve author's exact voice and style
-6. Make the smallest possible edits
+CORE PRINCIPLE: CHARITABLE INTERPRETATION
+- ASSUME the text is coherent and contains a unified argument
+- Your job is to EXTRACT and ARTICULATE that argument clearly
+- Resolve apparent tensions or ambiguities charitably, showing how they fit together
+- Present the author's thesis and supporting reasoning as a unified whole
 
-FORBIDDEN IN CONSERVATIVE MODE:
-- Major rewrites or restructuring
-- Adding examples when the original didn't have them
-- Changing natural language to academic language
-- Changing the author's personality or tone`;
+WHAT YOU ARE PRODUCING:
+A self-contained essay that explains, in clear prose, what the text is saying. Someone who has NEVER read the original should be able to understand the author's complete argument just by reading YOUR interpretation.
 
-          userPrompt = `CONSERVATIVE RECONSTRUCTION MODE
+STRICT REQUIREMENTS:
+1. Write in CONTINUOUS PROSE - flowing paragraphs, not fragments
+2. NO BULLETS, NO LISTS, NO FRAGMENTS - full sentences in connected paragraphs only
+3. Structure: Opening context → Core thesis → Supporting arguments → How they connect → Synthesis
+4. 3-7 substantive paragraphs (not one giant block, not scattered notes)
+5. SELF-CONTAINED: Do not say "the text argues" or "the author claims" - instead, PRESENT the argument directly as if explaining it to someone
+6. Use natural academic prose - clear, precise, but not jargon-heavy
 
-Text to fix (MINIMAL CHANGES ONLY):
+ABSOLUTELY FORBIDDEN:
+- Bullet points or numbered lists
+- Sentence fragments
+- Headers or section markers
+- Meta-commentary ("this text is about...", "the author seems to...")
+- Scattered quotes without integration
+- Leaving loose ends or unresolved tensions`;
+
+          userPrompt = `CONSERVATIVE RECONSTRUCTION: Charitable Interpretation
+
+================================
+TEXT TO INTERPRET
+================================
 ${text}
 
-${targetDomain ? `Target domain: ${targetDomain}` : ''}
-${customInstructions ? `\nCustom Instructions: ${customInstructions}` : ''}
+${targetDomain ? `Context/domain: ${targetDomain}` : ''}
+${customInstructions ? `\nAdditional instructions: ${customInstructions}` : ''}
 
-YOUR TASK:
-Make the SMALLEST POSSIBLE changes to fix only obvious errors:
-- Fix only claims that are demonstrably false
-- Keep original wording wherever possible
-- Do NOT add examples unless critical
-- Preserve exact tone and voice
-- Minimal intervention
+================================
+YOUR TASK
+================================
+Produce a SELF-CONTAINED, COHERENT interpretation of this text.
 
-CRITICAL: Output ONLY the lightly-edited text itself. NO commentary, NO explanation, NO headers. Just the minimally-fixed text.`;
+Assume the text is coherent. Your job is to articulate the unified argument it contains.
+
+Write a 3-7 paragraph essay in continuous prose that:
+1. Opens with the context/problem the author is addressing
+2. States the author's core thesis or central claim
+3. Explains the supporting arguments and reasoning
+4. Shows how the parts connect into a unified whole
+5. Concludes with the upshot or significance
+
+REMEMBER:
+- NO bullets, NO lists, NO fragments - continuous prose only
+- Self-contained: someone unfamiliar with the original should understand the complete argument
+- Charitable: resolve tensions by showing how apparent contradictions actually cohere
+- Direct: present the argument, don't describe or summarize it from a distance
+
+OUTPUT: Just the interpretation itself - no headers, no meta-commentary, no explanation of what you did. Pure flowing prose that articulates the text's unified argument.`;
 
         } else {
           // AGGRESSIVE MODE - maximum transformation

@@ -86,3 +86,12 @@ The application uses a monorepo structure, separating client and server.
     6. **FINAL VERDICT**: State whether all axioms are true and explain domain switches
     7. **ISOMORPHISM DEMONSTRATION**: Show the structural mapping that preserves logic while achieving truth
   - Key distinction: "TRUE" means empirically verifiable or logically necessary in reality, not "satisfies axioms in made-up domain."
+  
+- **December 2, 2025**:
+  - **Conservative Reconstruction Complete Overhaul**: Replaced "minimal fixes" mode with "Charitable Interpretation" mode. Now produces a SELF-CONTAINED, COHERENT essay that articulates the text's unified argument. Key features:
+    - Assumes text is coherent (charitable interpretation principle)
+    - Extracts unified thesis + supporting arguments as flowing prose
+    - 3-7 substantive paragraphs in continuous prose (NO bullets, NO fragments)
+    - Self-contained: reader unfamiliar with original can understand complete argument
+    - Direct presentation of argument, not meta-commentary ("the text says...")
+    - Resolves apparent tensions charitably by showing how they cohere
